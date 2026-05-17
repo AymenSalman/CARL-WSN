@@ -1,0 +1,26 @@
+# MATLAB temporary files
+*.asv
+*.m~
+*.mex*
+*.mexw64
+*.mexmaci64
+octave-workspace
+*.fig
+
+# LaTeX temporary files
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.toc
+
+# Windows system files
+Thumbs.db
+desktop.ini
+
+# macOS system files
+.DS_Store
