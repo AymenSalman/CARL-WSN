@@ -17,6 +17,11 @@ octave-workspace
 *.fls
 *.fdb_latexmk
 *.toc
+*.lof
+*.lot
+
+# LaTeX compiled output (keep source, exclude compiled PDF)
+paper/main.pdf
 
 # Windows system files
 Thumbs.db
@@ -24,3 +29,6 @@ desktop.ini
 
 # macOS system files
 .DS_Store
+
+# VS Code settings
+.vscode/
