@@ -141,25 +141,183 @@ Section~\ref{sec:discussion} discusses key findings and limitations.
 Section~\ref{sec:conclusion} concludes the paper.
 
 % ── SECTION II ────────────────────────────────────────────────────────────────
+% ── SECTION II ────────────────────────────────────────────────────────────────
 \section{Related Work}
 \label{sec:related}
 
-% TODO: Write after completing literature review in Phase 1
-% Cover: proactive protocols, reactive protocols, hybrid protocols,
-% context-aware routing (cite Roberts 2025 survey), energy-efficient
-% WSN routing, gaps in existing work.
-
 \subsection{Proactive and Reactive Routing Protocols}
-Placeholder --- to be completed after literature review.
+
+Routing protocols for WSNs and ad~hoc networks have been broadly
+classified into proactive and reactive categories, each with
+distinct performance trade-offs that make neither approach
+universally optimal for heterogeneous IoT deployments.
+
+Proactive protocols maintain routing tables continuously through
+periodic broadcasts. DSDV~\cite{perkins1994} established the
+foundational destination-sequenced distance-vector approach,
+guaranteeing loop-free routes at all times. OLSR~\cite{clausen2003}
+extended this paradigm through multipoint relay (MPR) selection,
+substantially reducing flooding overhead in dense networks.
+While proactive protocols deliver consistently low latency by
+eliminating route discovery delays, their continuous maintenance
+overhead leads to significant energy waste on low-traffic
+nodes~\cite{a_al-healy_wsn_2025}.
+
+Reactive protocols discover routes exclusively on demand.
+AODV~\cite{perkins1999} pioneered this approach by initiating
+route requests only when data must be transmitted, conserving
+energy in sparse or low-traffic conditions. However, the
+route discovery delay of 20--100\,ms introduced by RREQ/RREP
+flooding renders reactive protocols unsuitable for
+latency-sensitive applications~\cite{selim_manet_2025}.
+A comparative analysis by Nurul~Hidayah~et~al.~\cite{nurul_hidayah_ahmad_zukri_comparative_2025}
+confirmed that neither proactive nor reactive protocols alone
+achieve optimal performance across varying network conditions,
+motivating the need for adaptive hybrid approaches.
+Recent work~\cite{karthikeyan_optimizing_2025} demonstrated
+that AODV, DSDV, and DSR all exhibit significant performance
+degradation under heterogeneous traffic loads, highlighting
+the fundamental limitation of single-mode routing for
+IoT-driven smart city deployments.
 
 \subsection{Hybrid Routing Protocols}
-Placeholder --- to be completed after literature review.
 
-\subsection{Context-Aware Routing in WSNs}
-Placeholder --- to be completed after literature review.
+Hybrid protocols attempt to combine the latency advantages of
+proactive routing with the energy efficiency of reactive routing.
+ZRP~\cite{haas2001} pioneered zone-based hybrid routing by
+maintaining proactive routes within a fixed-radius zone and
+using reactive inter-zone routing for destinations beyond the
+zone boundary. While ZRP reduces control overhead compared to
+purely proactive protocols, its fixed zone radius is configured
+statically and does not adapt to node energy state or traffic
+urgency --- a fundamental limitation that CARHy-WSN addresses
+directly.
+
+Subsequent hybrid approaches incorporated additional optimisation
+dimensions. Chaurasiya~et~al.~\cite{chaurasiya_energy-efficient_2023}
+proposed a hybrid clustering technique for multilevel heterogeneous
+IoT WSNs, combining cluster-based organisation with multi-hop
+routing to reduce energy consumption. Lei~\cite{lei_energy-aware_2024}
+proposed a hybrid energy-aware approach combining particle swarm
+optimisation with fuzzy clustering for IoT routing, demonstrating
+52\% energy reduction compared to DEEC, though at the cost of
+requiring offline training data for the fuzzy membership functions.
+Srinivasa~Babu~et~al.~\cite{srinivasa_babu_kasturi_improved_2022}
+proposed a neuro-fuzzy hybrid routing scheme for IoT that
+incorporates context-like features, but similarly requires a
+trained model that cannot adapt at runtime without retraining.
+Nadanam~et~al.~\cite{nadanam_innovative_2026} recently proposed a
+quantum-optimised hybrid routing framework achieving 30\%
+energy reduction, though the computational complexity of quantum
+optimisation makes it unsuitable for resource-constrained sensor
+hardware. Sudha~et~al.~\cite{sudha_intelligent_2025} combined
+Q-learning with machine learning for cluster head selection and
+routing in 5G-enabled WSNs, demonstrating improved throughput
+over LEACH, but without considering per-packet application
+urgency as a routing criterion.
+
+A common limitation across all these hybrid approaches is that
+mode selection or routing decisions are made based on a single
+optimisation objective --- typically energy or load --- without
+awareness of the application-level urgency of the traffic being
+routed.
+
+\subsection{Context-Aware Routing in IoT-WSNs}
+
+Context-aware computing for IoT was formally defined by
+Perera~et~al.~\cite{perera_context_2014}, who identified five
+contextual dimensions --- identity, location, activity, time,
+and relations --- as fundamental to intelligent IoT decision
+making. This foundational work motivates the use of contextual
+information in routing decisions, though the specific application
+to WSN hybrid routing mode selection had not been addressed
+until recently.
+
+Context-aware routing has since been applied across several IoT
+and WSN domains. Monteiro~et~al.~\cite{monteiro_context-aware_2019}
+proposed context-aware network selection in heterogeneous wireless
+networks, demonstrating that context-driven decisions outperform
+static policies, but their work focused on network selection
+rather than intra-WSN routing mode switching.
+Akpakwu~et~al.~\cite{akpakwu_cacc_2020} proposed a
+context-aware congestion control scheme for CoAP/UDP IoT
+networks, applying context sensing to transport-layer decisions
+rather than routing.
+Sithik and Kumar~\cite{sithik_intelligent_2022} proposed a
+multi-context aware parent selection scheme for the RPL
+protocol using grey set theory, incorporating multiple
+contextual parameters into routing metric computation.
+However, their approach targets RPL parent selection exclusively
+and does not implement dynamic switching between fundamentally
+different routing modes (proactive, reactive, and hybrid)
+based on application urgency class.
+Karagiannis~et~al.~\cite{karagiannis_context-aware_2023}
+proposed context-aware routing for fog computing systems,
+reducing latency by 23\% and hop count by 73\% through
+context-driven forwarding decisions. Their work operates
+at the fog layer rather than the WSN sensor layer, and
+does not model heterogeneous traffic classes with
+conflicting QoS requirements.
+Hasan~et~al.~\cite{hasan_context-aware_2025} proposed a
+context-aware trust prediction framework for opportunistic
+IoT routing using Bayesian inference, achieving 88.9\%
+delivery ratio, though the trust-based context dimension
+differs fundamentally from the urgency-energy-stability
+context vector proposed in CARHy-WSN.
+
+Smart city IoT routing has also received significant attention.
+Hanif~et~al.~\cite{hanif_opportunistically_2018} proposed
+opportunistic IoT-WSN integration for smart city routing.
+Inga~et~al.~\cite{inga_novel_2021} addressed WSN sizing and
+routing for smart city deployments.
+Ekler~et~al.~\cite{ekler_energy_2022} proposed energy-aware
+IoT routing algorithms specifically for smart city environments.
+Karunkuzhali~et~al.~\cite{karunkuzhali_oqr-sc_2022,
+karunkuzhali_qos-aware_2024} proposed QoS-aware routing
+frameworks for IoT-WSNs in smart cities, demonstrating that
+multi-class service differentiation improves network performance.
+However, none of these works implement dynamic routing mode
+switching based on per-packet application urgency.
+El-Fouly~et~al.~\cite{el-fouly_environment-aware_2023}
+proposed environment-aware real-time routing for multi-sink
+WSNs in smart cities, incorporating deadline constraints and
+link quality metrics. While this work shares the multi-sink
+topology with our prior work~\cite{salman2023} and considers
+real-time delivery requirements, it does not model
+heterogeneous application urgency classes or implement
+context-driven mode switching.
+
+Recent surveys confirm that AI-assisted and context-aware
+routing are among the most active research frontiers in
+IoT-WSN networking.
+Priyadarshi~\cite{priyadarshi_energy-efficient_2024} reviewed
+meta-heuristic and AI-based routing approaches, while
+Priyadarshi~\cite{priyadarshi_ai-based_2025} further examined
+AI-driven routing improvements for energy efficiency and
+reliability.
+Saadallah and Alabady~\cite{saadallah_comprehensive_2024}
+identified energy-efficient context-sensitive routing as an
+open challenge in their comprehensive IoT routing study.
+Yilmaz~et~al.~\cite{yilmaz_sustainable_2025} highlighted the
+integration of ML and AI into WSN routing as a key trend for
+5G/6G sustainable communication.
+Daanoune and Baghdad~\cite{daanoune_intelligent_2026} recently
+proposed a reinforcement learning-based clustering and routing
+protocol (RLCR) for heterogeneous WSNs, demonstrating the
+potential of AI-driven approaches for adaptive routing, though
+without application-context awareness in mode selection.
 
 \subsection{Research Gaps}
-Placeholder --- to be completed after literature review.
+
+The preceding review reveals four specific gaps that motivate
+CARHy-WSN. First, Khedr~et~al.~\cite{roberts2025} conducted
+the first comprehensive survey of context-aware routing in
+IoT-driven WSNs and explicitly identified dynamic
+application-context-based mode switching as an open research
+direction, noting that reactive and hybrid context-aware methods
+have received significantly less attention than proactive
+approaches. Second, Kumar~et~al.~\cite{kumar_exploring_2025}
+identified applicat
 
 % ── SECTION III ───────────────────────────────────────────────────────────────
 \section{System Model}
@@ -821,46 +979,7 @@ advantages hold under realistic channel conditions and
 hardware constraints.
 
 % ── References ────────────────────────────────────────────────────────────────
-\begin{thebibliography}{99}
-
-\bibitem{salman2021}
-A.~J. Salman, ``Energy-harvesting and energy-aware routing algorithm
-for heterogeneous energy {WSN}s,''
-\textit{Int. J. Electrical and Computer Engineering}, 2021.
-
-\bibitem{salman2023}
-A.~J. Salman, ``Load balancing in multi-sink {IoT} networks,''
-\textit{Int. J. Scientific and Engineering Research}, 2023.
-
-\bibitem{roberts2025}
-M.~K. Roberts et~al., ``Advancing {IoT}-driven {WSN}s with
-context-aware routing: A comprehensive review,''
-\textit{Computer Science Review}, Elsevier, Aug. 2025.
-
-\bibitem{perkins1994}
-C.~E. Perkins and P.~Bhagwat, ``Highly dynamic
-destination-sequenced distance-vector routing for mobile computers,''
-in \textit{Proc. ACM SIGCOMM}, 1994, pp.~234--244.
-
-\bibitem{perkins1999}
-C.~E. Perkins and E.~M. Royer, ``Ad-hoc on-demand distance vector
-routing,'' in \textit{Proc. IEEE WMCSA}, 1999, pp.~90--100.
-
-\bibitem{clausen2003}
-T.~Clausen and P.~Jacquet, ``Optimized link state routing protocol
-({OLSR}),'' IETF RFC 3626, 2003.
-
-\bibitem{haas2001}
-Z.~J. Haas and M.~R. Pearlman, ``The performance of query control
-schemes for the zone routing protocol,''
-\textit{IEEE/ACM Trans. Networking}, vol.~9, no.~4,
-pp.~427--438, Aug. 2001.
-
-\bibitem{heinzelman2000}
-W.~R. Heinzelman, A.~Chandrakasan, and H.~Balakrishnan,
-``Energy-efficient communication protocol for wireless microsensor
-networks,'' in \textit{Proc. IEEE HICSS}, 2000, pp.~1--10.
-
-\end{thebibliography}
+\bibliographystyle{IEEEtran}
+\bibliography{references}
 
 \end{document}
