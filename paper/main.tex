@@ -71,7 +71,7 @@ traffic, MATLAB simulation.
 foundational component of Internet of Things (IoT)-driven smart city
 infrastructure, enabling continuous and distributed monitoring across
 domains including environmental sensing, smart transportation,
-industrial automation, and emergency response~\cite{salman2021}.
+industrial automation, and emergency response~\cite{salman2021, akyildiz2002}.
 As smart city deployments scale in both node density and application
 diversity, the routing protocols governing data delivery face
 increasing pressure to simultaneously satisfy conflicting requirements:
@@ -82,9 +82,10 @@ Existing routing approaches broadly fall into three categories.
 Proactive protocols, such as DSDV~\cite{perkins1994} and
 OLSR~\cite{clausen2003}, maintain routing tables continuously,
 delivering low latency at the cost of high energy overhead from
-periodic updates. Reactive protocols, such as AODV~\cite{perkins1999},
-discover routes on demand, conserving energy in sparse networks but
-introducing significant route discovery delays that are intolerable
+periodic updates. Reactive protocols, such as AODV~\cite{perkins1999} and
+DSR~\cite{johnson1996}, discover routes on demand, conserving
+energy in sparse networks but introducing significant route
+discovery delays that are intolerable
 for time-critical applications. Hybrid protocols, such as
 ZRP~\cite{haas2001}, partition the network into zones and apply
 different modes within and across zone boundaries. However, ZRP and
@@ -141,7 +142,7 @@ Section~\ref{sec:discussion} discusses key findings and limitations.
 Section~\ref{sec:conclusion} concludes the paper.
 
 % ── SECTION II ────────────────────────────────────────────────────────────────
-% ── SECTION II ────────────────────────────────────────────────────────────────
+
 \section{Related Work}
 \label{sec:related}
 
@@ -152,6 +153,8 @@ classified into proactive and reactive categories, each with
 distinct performance trade-offs that make neither approach
 universally optimal for heterogeneous IoT deployments.
 
+Routing protocols for WSNs have been extensively surveyed and
+classified~\cite{akkaya2005, a_al-healy_wsn_2025}.
 Proactive protocols maintain routing tables continuously through
 periodic broadcasts. DSDV~\cite{perkins1994} established the
 foundational destination-sequenced distance-vector approach,
@@ -317,7 +320,22 @@ application-context-based mode switching as an open research
 direction, noting that reactive and hybrid context-aware methods
 have received significantly less attention than proactive
 approaches. Second, Kumar~et~al.~\cite{kumar_exploring_2025}
-identified applicat
+identified application-context awareness as an emerging
+research gap through a bibliometric analysis of
+energy-efficient routing in IoT WSNs spanning 2015--2024.
+Third, Chu~et~al.~\cite{chu_leach_2026},
+Khanna~et~al.~\cite{khanna_energy-efficient_2021}, and
+Prashanth~et~al.~\cite{prashanth2023} all noted that routing
+adaptation in heterogeneous WSNs remains dominated by
+single-objective optimisation approaches that cannot
+simultaneously satisfy the conflicting requirements of
+heterogeneous application traffic classes.
+Fourth, no published protocol uses a joint three-dimensional
+context vector comprising application urgency, residual energy
+ratio, and link stability score to dynamically select between
+proactive, reactive, and hybrid routing modes on a per-packet
+basis --- the specific contribution of CARHy-WSN introduced
+in this paper.
 
 % ── SECTION III ───────────────────────────────────────────────────────────────
 \section{System Model}
@@ -638,6 +656,13 @@ $(200, 100)$\,m, consistent with the multi-sink topology established
 in our prior work~\cite{salman2023}.
 Nodes are initialised with heterogeneous energy levels drawn from a
 uniform distribution $E_0 \sim \mathcal{U}(0.5, 2.0)$\,J.
+MATLAB-based simulation is a well-established and widely accepted
+methodology for WSN routing protocol evaluation, as demonstrated
+by recent published studies~\cite{priyadarshi_ai-based_2025,
+daanoune_intelligent_2026, lbeer2025}.
+
+\subsection{Energy Model}
+
 
 \subsection{Energy Model}
 The first-order radio energy model~\cite{heinzelman2000} is
