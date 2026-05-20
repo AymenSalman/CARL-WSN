@@ -620,10 +620,11 @@ r_{zone}^i =
 
 Within the zone radius, proactive routing is used (routes
 pre-built). Beyond the zone radius, reactive inter-zone routing
-(IERP) is used. Energy-critical nodes shrink their zone to
-minimise maintenance broadcast overhead while preserving
-near-neighbourhood route availability --- the primary
-differentiation from fixed-radius ZRP.
+(IERP) is used. The zone radii 120\,m, 80\,m, and 40\,m correspond to
+approximately 60\%, 40\%, and 20\% of the maximum
+transmission range (200\,m), ensuring proactive zone
+coverage scales proportionally with the node's capacity
+to sustain broadcast overhead.
 
 \subsection{Overhead Analysis}
 
@@ -676,8 +677,6 @@ methodology for WSN routing protocol evaluation, as demonstrated
 by recent published studies~\cite{priyadarshi_ai-based_2025,
 daanoune_intelligent_2026, lbeer2025}.
 
-\subsection{Energy Model}
-
 
 \subsection{Energy Model}
 The first-order radio energy model~\cite{heinzelman2000} is
@@ -695,8 +694,13 @@ Three IoT application traffic classes are simulated simultaneously:
     \item \textbf{Class~C (Event-Driven):} Poisson arrivals,
     $\lambda_C = 0.1$\,packets/s, best-effort delivery.
 \end{itemize}
-In the mixed-traffic scenario, packets are generated with proportions
-of 20\%, 50\%, and 30\% for Classes~A, B, and~C respectively.
+In the mixed-traffic scenario, packets are generated with
+proportions of 20\%, 50\%, and 30\% for Classes~A, B,
+and~C respectively. These proportions reflect a realistic
+smart city IoT deployment in which emergency events are
+infrequent, periodic environmental monitoring dominates
+network traffic, and event-driven sensing forms an
+intermediate tier~\cite{zohrabi2024,el-fouly_environment-aware_2023}.
 
 \subsection{Simulation Parameters}
 Table~\ref{tab:params} summarises all simulation
@@ -783,7 +787,7 @@ across five independent runs.}
 CARHy-WSN achieves the lowest overhead of \textbf{1.87} control
 packets per data packet --- a \textbf{70.2\% reduction} vs.\ DSDV
 (6.27), \textbf{41.0\% reduction} vs.\ AODV (3.16), and
-\textbf{38.6\% reduction} vs.\ MSLBA (3.04),as shown in Fig.~\ref{fig:overhead}. One-way ANOVA confirms overhead differences are
+\textbf{38.6\% reduction} vs.\ MSLBA (3.04), as shown in Fig.~\ref{fig:overhead}. One-way ANOVA confirms overhead differences are
 statistically significant ($F = 384.1$, $p < 0.001$).
 Tukey HSD confirms CARHy-WSN overhead is significantly
 lower than all five baselines (all $p < 0.001$).
@@ -857,9 +861,13 @@ vs.\ MSLBA      & 61.1\% & 38.6\% \\
 \end{tabular}
 \end{table}
 
-CARHy-WSN is the only protocol achieving near-optimal Class~A
-latency and lowest routing overhead simultaneously across all
-evaluated protocols.
+CARHy-WSN is the only protocol achieving near-optimal
+Class~A latency and lowest routing overhead simultaneously
+across all evaluated protocols. The Gini coefficient for
+energy consumption ranges from 0.186 (CARHy-WSN) to
+0.195 (EH-Routing) across all protocols, confirming that
+context-aware mode switching does not introduce energy
+concentration at specific nodes.
 
 \subsection{Decision Tree Classifier Validation}
 
