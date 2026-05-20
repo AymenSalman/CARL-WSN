@@ -20,10 +20,17 @@
 \title{CARHy-WSN: A Context-Aware Hybrid Proactive-Reactive Routing
 Protocol for Heterogeneous IoT-Driven Wireless Sensor Networks}
 
-\author{Aymen~Jaber~Salman,~\IEEEmembership{Member,~IEEE}
-\thanks{A. J. Salman is with the Department of Computer Engineering,
+\author{Aymen~Jaber~Salman,
+Atheel~Nowfal~Alkhayyat, and Ruslan~Saad~Abdulrahman
+\thanks{A.~J. Salman is with the Department of Computer Engineering,
 Al-Nahrain University, Baghdad, Iraq.
-E-mail: aymen@nahrainuniv.edu.iq}}
+E-mail: aymen.j.salman@nahrainuniv.edu.iq}
+\thanks{A.~N. Alkhayyat is with the Department of Computer Engineering,
+Al-Nahrain University, Baghdad, Iraq.
+E-mail: atheel.n.al-khayyat@nahrainuniv.edu.iq}
+\thanks{R.~S. Abdulrahman is with the Department of Computer Engineering,
+Al-Nahrain University, Baghdad, Iraq.
+E-mail: ruslan.s.al-nuaimi@nahrainuniv.edu.iq}}
 
 \markboth{IEEE TRANSACTIONS ON NETWORKING, VOL.~X, NO.~X, 2026}{}
 
@@ -51,9 +58,12 @@ achieves an 82.5\% reduction in Class~A emergency packet latency
 compared to AODV, a 70.2\% reduction in routing overhead compared to
 DSDV, and maintains a packet delivery ratio of 100\% across all
 evaluated scenarios, while preserving competitive energy balance across all
-evaluated scenarios. A lightweight decision tree variant
-achieves 100\% classification accuracy with only 0.3\,KB
-memory overhead, enabling self-configuring deployment.
+evaluated scenarios. A lightweight decision tree variant achieves 100\% classification
+accuracy with only 0.3\,KB memory overhead, enabling
+self-configuring deployment. CARHy-WSN prioritises simultaneous
+latency and overhead optimisation for safety-critical heterogeneous
+IoT deployments, achieving these gains within a deliberate
+network lifetime trade-off relative to lifetime-optimised baselines.
 \end{abstract}
 
 % ── Keywords ──────────────────────────────────────────────────────────────────
@@ -253,7 +263,12 @@ contextual parameters into routing metric computation.
 However, their approach targets RPL parent selection exclusively
 and does not implement dynamic switching between fundamentally
 different routing modes (proactive, reactive, and hybrid)
-based on application urgency class.
+based on application urgency class. Unlike Sithik and
+Kumar~\cite{sithik_intelligent_2022}, who optimise a single
+routing metric within RPL, CARHy-WSN introduces a
+three-dimensional context vector that triggers full routing
+paradigm switching --- the first such mechanism reported in
+the WSN routing literature.
 Karagiannis~et~al.~\cite{karagiannis_context-aware_2023}
 proposed context-aware routing for fog computing systems,
 reducing latency by 23\% and hop count by 73\% through
