@@ -105,6 +105,9 @@ end
 % Gini coefficient (energy balance — lower is better)
 metrics.Gini = compute_gini(net.E0 - net.energy);
 
+% Alive nodes per round (for lifetime figure)
+metrics.alive_per_round = net.metrics.alive_per_round;
+
 % Routing overhead (control packets per data packet)
 if data_pkts > 0
     metrics.Overhead = ctrl_pkts / data_pkts;
