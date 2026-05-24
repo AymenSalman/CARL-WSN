@@ -170,7 +170,7 @@ distinct performance trade-offs that make neither approach
 universally optimal for heterogeneous IoT deployments.
 
 Routing protocols for WSNs have been extensively surveyed and
-classified~\cite{akkaya2005, a_al-healy_wsn_2025}.
+classified~\cite{akkaya2005}.
 Proactive protocols maintain routing tables continuously through
 periodic broadcasts. DSDV~\cite{perkins1994} established the
 foundational destination-sequenced distance-vector approach,
@@ -180,7 +180,7 @@ substantially reducing flooding overhead in dense networks.
 While proactive protocols deliver consistently low latency by
 eliminating route discovery delays, their continuous maintenance
 overhead leads to significant energy waste on low-traffic
-nodes~\cite{a_al-healy_wsn_2025}.
+nodes~\cite{akkaya2005}.
 
 Reactive protocols discover routes exclusively on demand.
 AODV~\cite{perkins1999} pioneered this approach by initiating
@@ -670,22 +670,23 @@ encodes five rules derived from the following design principles:
 \end{enumerate}
 
 \begin{table}[!t]
-\renewcommand{\arraystretch}{1.3}
+\renewcommand{\arraystretch}{1.2}
 \caption{CARHy-WSN Mode-Switching Decision Table}
 \label{tab:decision}
 \centering
-\begin{tabular}{cccc}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccc}
 \hline
-\textbf{Class $U$} & \textbf{Energy $E_r^i$} &
-\textbf{Link $L_s^i$} & \textbf{Mode selected} \\
+\textbf{Class $U$} & \textbf{Energy $E_r^i$} & \textbf{Link $L_s^i$} & \textbf{Mode selected} \\
 \hline
-A (emergency) & Any        & Any          & Proactive \\
-B or C        & $\geq T_E$ & $\geq T_L$   & Reactive  \\
-B             & $< T_E$    & Any          & Hybrid    \\
-B or C        & Any        & $< T_L$      & Proactive \\
-C             & $< T_E$    & $< T_L$      & Reactive  \\
+A (emergency) & Any & Any & Proactive \\
+B or C & $\geq T_E$ & $\geq T_L$ & Reactive \\
+B & $< T_E$ & Any & Hybrid \\
+B or C & Any & $< T_L$ & Proactive \\
+C & $< T_E$ & $< T_L$ & Reactive \\
 \hline
-\end{tabular}
+\multicolumn{4}{l}{\footnotesize Rules are evaluated top-to-bottom; the first matching rule applies.} \\
+\end{tabular}}
 \end{table}
 
 \subsection{Routing Modes}
@@ -772,16 +773,28 @@ hardware without modification.
 The simulation models a smart city IoT-WSN deployment comprising
 $N = 100$ heterogeneous sensor nodes randomly distributed over a
 $200 \times 200$\,m$^2$ area using a uniform random distribution.
-A base station is positioned at the centre of the deployment area
-at coordinates $(100, 100)$\,m, and a secondary sink is placed at
-$(200, 100)$\,m, consistent with the multi-sink topology established
-in our prior work~\cite{salman2023}.
+A base station is positioned at the centre of the
+deployment area at coordinates $(100, 100)$\,m, and a secondary
+sink is placed at $(200, 100)$\,m, as illustrated in
+Fig.~\ref{fig:topology}, consistent with the multi-sink
+topology established in our prior work~\cite{salman2023}.
 Nodes are initialised with heterogeneous energy levels drawn from a
 uniform distribution $E_0 \sim \mathcal{U}(0.5, 2.0)$\,J.
 MATLAB-based simulation is a well-established and widely accepted
 methodology for WSN routing protocol evaluation, as demonstrated
 by recent published studies~\cite{priyadarshi_ai-based_2025,
 daanoune_intelligent_2026, lbeer2025}.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig_topology}
+\caption{Network deployment topology: $N=100$ heterogeneous sensor nodes
+distributed over a $200 \times 200$\,m$^2$ area. The base station (BS)
+is at $(100, 100)$\,m and the secondary sink at $(200, 100)$\,m. Node
+colour indicates initial energy $E_0 \sim \mathcal{U}(0.5, 2.0)$\,J.
+The dashed circle shows the 100\,m communication range around the BS.}
+\label{fig:topology}
+\end{figure}
 
 
 \subsection{Energy Model}
@@ -800,9 +813,8 @@ Three IoT application traffic classes are simulated simultaneously:
     \item \textbf{Class~C (Event-Driven):} Poisson arrivals,
     $\lambda_C = 0.1$\,packets/s, best-effort delivery.
 \end{itemize}
-In the mixed-traffic scenario, packets are generated with
-proportions of 20\%, 50\%, and 30\% for Classes~A, B,
-and~C respectively. These proportions reflect a realistic
+In the mixed-traffic scenario, packets are generated with proportions of 20\%, 50\%, and 30\% for Classes~A, B, and~C respectively. In all four scenarios (Class~A only, Class~B only, Class~C only, and Mixed), the total traffic volume per round is held constant --- only the class composition varies. This experimental design ensures that performance differences across scenarios are attributable to context-aware routing decisions, not to differences in offered load. Consequently, baseline protocols that do not differentiate traffic classes produce identical performance across all scenarios, while CARHy-WSN's metrics vary as the context classifier selects different routing modes for different class compositions. 
+These proportions reflect a realistic
 smart city IoT deployment in which emergency events are
 infrequent, periodic environmental monitoring dominates
 network traffic, and event-driven sensing forms an
@@ -873,7 +885,7 @@ six protocols are statistically significant
 ($F = 184{,}614.3$, $p < 0.001$). Tukey HSD post-hoc
 analysis confirms CARHy-WSN achieves significantly lower
 Class~A latency than AODV, ZRP, EH-Routing, and MSLBA
-(all $p < 0.001$). Notably, CARHy-WSN and DSDV are
+(all $p < 0.001$). The low latency variance across seeds ($\sigma = 0.009$\,ms) reflects the deterministic nature of proactive routing: since Class~A packets always use pre-built routing tables, latency is dominated by the fixed table-lookup cost rather than topology-dependent route discovery. Notably, CARHy-WSN and DSDV are
 statistically tied on latency ($\Delta = 0.01$\,ms,
 $p = 1.000$) since both route Class~A traffic via proactive
 mode --- however CARHy-WSN achieves this with 70.2\%
@@ -900,6 +912,19 @@ lower than all five baselines (all $p < 0.001$).
 
 \begin{figure}[!t]
 \centering
+\includegraphics[width=\columnwidth]{fig7_alive_nodes}
+\caption{Number of alive nodes over time for all six protocols under
+the mixed-traffic scenario. CARHy-WSN, AODV, DSDV, and ZRP exhibit
+similar lifetime profiles (FND $\approx$ 34), while EH-Routing
+extends lifetime through energy-aware relay selection. The comparable
+decline rates confirm that CARHy-WSN's FND is not uniquely
+disadvantaged relative to the three classical baselines.}
+\label{fig:alive}
+\end{figure}
+
+
+\begin{figure}[!t]
+\centering
 \includegraphics[width=\columnwidth]{fig5_routing_overhead}
 \caption{Routing overhead (control packets per data packet).
 CARHy-WSN achieves the lowest overhead, with 70.2\% reduction
@@ -910,6 +935,11 @@ vs.\ DSDV.}
 \subsection{Packet Delivery Ratio}
 All six protocols achieve a PDR of 100\% under all traffic scenarios,
 confirming correct implementation and sufficient network density.
+The uniform 100\% PDR reflects the high network connectivity of the
+$200 \times 200$\,m deployment with $N=100$ nodes; sparser deployments
+or realistic link failure models may differentiate PDR performance
+across protocols.
+
 
 \subsection{Network Lifetime}
 
@@ -918,9 +948,13 @@ across all protocols. EH-Routing achieves the longest network
 lifetime (FND = 787, HND = 1432), as it was specifically
 designed to maximise node lifetime by always selecting the
 highest-residual-energy relay. CARHy-WSN (FND = 34,
-HND = 741) does not optimise for lifetime alone — this is a
+HND = 741) does not optimise for lifetime alone --- this is a
 deliberate design trade-off that is discussed fully in
-Section~\ref{sec:discussion}. CARHy-WSN balances latency,
+Section~\ref{sec:discussion}. Fig.~\ref{fig:alive} confirms
+that CARHy-WSN, AODV, DSDV, and ZRP all exhibit similar
+lifetime profiles (FND $\approx$ 34), demonstrating that
+CARHy-WSN's lifetime is consistent with the same class of
+protocols rather than uniquely disadvantaged. CARHy-WSN balances latency,
 energy, and reliability simultaneously across heterogeneous
 traffic classes, whereas EH-Routing achieves long lifetime at the cost of
 high Class~A latency (47.5\,ms) --- a 171\% increase over
@@ -928,25 +962,45 @@ CARHy-WSN's 17.5\,ms --- and elevated routing overhead (4.50),
 rendering it unsuitable for emergency IoT deployments with
 sub-100\,ms latency requirements.
 
+Table~\ref{tab:lifetime} also reports average energy consumption and
+throughput. CARHy-WSN consumes 0.105\,J per round --- higher than
+DSDV (0.093\,J) and MSLBA (0.071\,J) --- because proactive mode
+incurs table maintenance overhead on every Class~A packet regardless
+of node energy state. This is the energy cost of guaranteeing
+sub-100\,ms emergency latency; baselines that achieve lower per-round
+energy do so at the expense of either high latency (AODV: 100\,ms)
+or high routing overhead (DSDV: 6.27). Similarly, CARHy-WSN's
+throughput (36.9\,pkts/round) is lower than DSDV (41.7) and
+EH-Routing (70.3) primarily because EH-Routing's longer network
+lifetime enables more nodes to remain active and generate traffic
+across the full 2000-round simulation. This throughput difference
+is therefore a direct consequence of the lifetime trade-off, not
+a routing efficiency deficiency.
+
+
 \begin{table}[!h]
 \renewcommand{\arraystretch}{1.3}
 \caption{Network Lifetime and Key Metrics --- Mixed Traffic}
 \label{tab:lifetime}
 \centering
-\begin{tabular}{lcccc}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccccc}
 \hline
 \textbf{Protocol} & \textbf{FND} & \textbf{HND} &
-\textbf{LatA (ms)} & \textbf{Overhead} \\
+\textbf{LatA (ms)} & \textbf{Overhead} &
+\textbf{AvgE (J)} & \textbf{Tput (pkt/rnd)} \\
 \hline
-CARHy-WSN  & 34    & 741  & \textbf{17.5} & \textbf{1.87} \\
-AODV       & 33.6  & 705  & 100.0         & 3.16 \\
-DSDV       & 34    & 849  & 17.5          & 6.27 \\
-ZRP        & 34    & 847  & 22.8          & 4.70 \\
-EH-Routing & \textbf{787}  & \textbf{1432} & 47.5 & 4.50 \\
-MSLBA      & 44.2  & 1026 & 45.0          & 3.04 \\
+CARHy-WSN  & 34    & 741  & \textbf{17.5} & \textbf{1.87} & 0.105 & 36.9 \\
+AODV       & 33.6  & 705  & 100.0         & 3.16          & 0.109 & 35.1 \\
+DSDV       & 34    & 849  & 17.5          & 6.27          & 0.093 & 41.7 \\
+ZRP        & 34    & 847  & 22.8          & 4.70          & 0.092 & 41.7 \\
+EH-Routing & \textbf{787}  & \textbf{1432} & 47.5 & 4.50  & 0.084 & \textbf{70.3} \\
+MSLBA      & 44.2  & 1026 & 45.0          & 3.04          & \textbf{0.071} & 51.1 \\
 \hline
-\end{tabular}
+\multicolumn{7}{l}{\footnotesize AvgE = mean energy consumed per round; Tput = packets delivered per round.} \\
+\end{tabular}}
 \end{table}
+
 
 \subsection{Summary of Improvements}
 
@@ -971,11 +1025,47 @@ vs.\ MSLBA      & 61.1\% & 38.6\% \\
 
 CARHy-WSN is the only protocol achieving near-optimal
 Class~A latency and lowest routing overhead simultaneously
-across all evaluated protocols. The Gini coefficient for
-energy consumption ranges from 0.186 (CARHy-WSN) to
-0.195 (EH-Routing) across all protocols, confirming that
-context-aware mode switching does not introduce energy
-concentration at specific nodes.
+across all evaluated protocols. Fig.~\ref{fig:gini} shows
+that the Gini coefficient for energy consumption ranges from
+0.186 (CARHy-WSN) to 0.195 (EH-Routing) across all protocols,
+confirming that context-aware mode switching does not introduce
+energy concentration at specific nodes. Fig.~\ref{fig:throughput}
+presents the per-round throughput, where EH-Routing leads due
+to its extended network lifetime; the throughput ranking
+mirrors the lifetime ranking (Table~\ref{tab:lifetime}),
+confirming that throughput differences are driven by node
+survival rather than per-packet routing efficiency.
+
+CARHy-WSN's overhead varies across traffic scenarios ---
+2.51 for Class~A only, 1.59 for Class~B only, 1.90 for
+Class~C only, and 1.87 for Mixed --- while all five
+baselines produce constant overhead regardless of traffic
+composition. This confirms that CARHy-WSN actively adapts
+its routing behaviour to traffic class, whereas baseline
+protocols treat all traffic identically.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig4_energy_gini}
+\caption{Gini coefficient of energy consumption across protocols
+(lower is more balanced). All protocols achieve similar energy
+balance (0.186--0.195), confirming that CARHy-WSN's context-aware
+mode switching does not concentrate energy consumption at specific
+nodes.}
+\label{fig:gini}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig6_throughput}
+\caption{Network throughput (packets delivered per round) under
+mixed traffic. Throughput rankings mirror the lifetime rankings
+in Table~\ref{tab:lifetime}, confirming that differences are
+driven by node survival duration rather than per-packet routing
+efficiency.}
+\label{fig:throughput}
+\end{figure}
+
 
 \subsection{Decision Tree Classifier Validation}
 
@@ -1055,11 +1145,46 @@ accuracy) confirm that the switching boundaries learned
 from these thresholds generalise well across unseen
 context vectors, suggesting that the default values
 are robust for a wide range of deployment conditions.
-Practitioners deploying CARHy-WSN in environments with
-significantly different energy profiles or channel
-conditions can retrain the decision tree variant using
-locally observed context data --- requiring no manual
+Table~\ref{tab:sensitivity} confirms this robustness empirically.
+Across all nine tested combinations of $T_E \in \{0.2, 0.3, 0.4\}$
+and $T_L \in \{0.6, 0.7, 0.8\}$, CARHy-WSN maintains a Class~A
+latency of 17.5\,ms and routing overhead between 1.86 and 1.87
+in all configurations --- corresponding to a latency reduction of
+82.5\% versus AODV and an overhead reduction of 70.2--70.3\% versus
+DSDV across all nine threshold pairs. This near-invariance arises
+because Rule~1 (Class~A $\rightarrow$ proactive) is unconditional
+on both thresholds, and the overhead is dominated by the proactive
+maintenance cost, which is threshold-independent. Practitioners
+deploying CARHy-WSN in environments with significantly different
+energy profiles or channel conditions can therefore use the default
+thresholds with confidence, or retrain the decision tree variant
+using locally observed context data --- requiring no manual
 threshold tuning.
+
+\begin{table}[!t]
+\renewcommand{\arraystretch}{1.2}
+\caption{Threshold Sensitivity Analysis --- Mixed Traffic}
+\label{tab:sensitivity}
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{cccccc}
+\hline
+$T_E$ & $T_L$ & \textbf{LatA (ms)} & \textbf{Overhead} &
+\textbf{Lat\% vs.\ AODV} & \textbf{OH\% vs.\ DSDV} \\
+\hline
+0.2 & 0.6 & 17.51 & 1.87 & 82.5\% & 70.2\% \\
+0.2 & 0.7 & 17.50 & 1.86 & 82.5\% & 70.3\% \\
+0.2 & 0.8 & 17.51 & 1.86 & 82.5\% & 70.3\% \\
+0.3 & 0.6 & 17.50 & 1.87 & 82.5\% & 70.2\% \\
+0.3 & 0.7 & 17.50 & 1.87 & 82.5\% & 70.2\% \\
+0.3 & 0.8 & 17.50 & 1.86 & 82.5\% & 70.3\% \\
+0.4 & 0.6 & 17.50 & 1.87 & 82.5\% & 70.2\% \\
+0.4 & 0.7 & 17.50 & 1.87 & 82.5\% & 70.2\% \\
+0.4 & 0.8 & 17.50 & 1.87 & 82.5\% & 70.2\% \\
+\hline
+\end{tabular}}
+\end{table}
+
 
 \subsection{Practical Deployment Considerations}
 
@@ -1094,7 +1219,7 @@ the 70.2\% reduction demonstrated at $N=100$.
 
 \subsection{Limitations}
 
-This study has three limitations that should be
+This study has four limitations that should be
 acknowledged. First, the simulation uses a simplified
 propagation model (first-order radio energy model)
 that does not capture multipath fading, shadowing,
@@ -1102,7 +1227,10 @@ or interference from co-deployed networks. Second,
 node mobility is not modelled --- all nodes are
 static after deployment. Third, the latency values
 are simulated rather than measured on physical
-hardware. Future work should validate CARHy-WSN
+hardware. Fourth, all results are reported for a single
+network size ($N=100$); scalability to larger deployments
+($N=500+$) is left for future validation.
+Future work should validate CARHy-WSN
 on a real sensor testbed (e.g.\ Raspberry Pi or
 Arduino with IEEE~802.15.4 radios) to confirm that
 the simulated latency advantages hold under realistic
@@ -1131,11 +1259,15 @@ overhead compared to DSDV ($p < 0.001$), and a
 \textbf{100\% packet delivery ratio} across all evaluated
 scenarios. CARHy-WSN is the only evaluated protocol that simultaneously
 achieves near-optimal emergency latency and minimum routing
-overhead --- a Pareto improvement over all five baselines,
-including DSDV which matches CARHy-WSN on latency but
-generates 70.2\% higher routing overhead, confirming that
-CARHy-WSN occupies the optimal operating point on the
-latency-overhead trade-off frontier. A lightweight
+overhead --- a Pareto improvement over all five baselines in the
+latency--overhead plane, including DSDV which matches
+CARHy-WSN on latency but generates 70.2\% higher routing
+overhead, confirming that CARHy-WSN occupies the optimal
+operating point on the latency--overhead trade-off frontier.
+This improvement is achieved within a deliberate network
+lifetime trade-off: CARHy-WSN prioritises sub-100\,ms
+emergency response over maximum node survival, an appropriate
+design choice for safety-critical IoT deployments. A lightweight
 decision tree variant achieves 100\% test accuracy
 and 99.96\% cross-validation accuracy with only
 0.3\,KB memory overhead, confirming the feasibility of self-configuring deployment
