@@ -851,11 +851,19 @@ Independent runs         & ---                 & 5 (seeds 42--46) \\
 
 \subsection{Baseline Protocols}
 CARHy-WSN is evaluated against five baseline protocols:
-(1)~AODV~\cite{perkins1999},
-(2)~DSDV~\cite{perkins1994},
-(3)~ZRP~\cite{haas2001},
-(4)~EH-Routing~\cite{salman2021}, and
-(5)~MSLBA~\cite{salman2023}.
+(1) AODV~\cite{perkins1999}, (2) DSDV~\cite{perkins1994},
+(3) ZRP~\cite{haas2001}, (4) EH-Routing~\cite{salman2021},
+and (5) MSLBA~\cite{salman2023}. AODV, DSDV, and ZRP are
+selected as the canonical representatives of the three routing
+paradigms (reactive, proactive, and hybrid) between which
+CARHy-WSN switches, enabling direct evaluation of whether
+context-aware mode selection outperforms each individual paradigm.
+EH-Routing and MSLBA are included as domain-specific baselines
+sharing the same heterogeneous energy model and multi-sink
+topology. The context-aware works surveyed in Table~\ref{tab:comparison}
+operate at different protocol layers (RPL parent selection, fog
+forwarding, opportunistic trust routing) and are therefore not
+directly comparable under the same WSN simulation framework.
 
 \subsection{Performance Metrics}
 Eight metrics are evaluated:
