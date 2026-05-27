@@ -1,9 +1,8 @@
-\documentclass[journal]{IEEEtran}
+\documentclass[preprint,12pt,number]{elsarticle}
 
-% ── Packages ──────────────────────────────────────────────────────────────────
+% ── Packages ──────────────────────────────────────────────────────────────
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{cite}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
@@ -13,33 +12,34 @@
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage{lineno}
+\usepackage{microtype}
+\emergencystretch=1em
 
-% ── Graphics path ─────────────────────────────────────────────────────────────
+% ── Graphics path ─────────────────────────────────────────────────────────
 \graphicspath{{../figures/}}
 
-% ── Title ─────────────────────────────────────────────────────────────────────
-\title{CARHy-WSN: A Context-Aware Hybrid Proactive-Reactive Routing
-Protocol for Heterogeneous IoT-Driven Wireless Sensor Networks}
-
-\author{Aymen~Jaber~Salman,
-Atheel~Nowfal~Alkhayyat, and Ruslan~Saad~Abdulrahman
-\thanks{A.~J. Salman is with the Department of Computer Engineering,
-Al-Nahrain University, Baghdad, Iraq.
-E-mail: aymen.j.salman@nahrainuniv.edu.iq}
-\thanks{A.~N. Alkhayyat is with the Department of Computer Engineering,
-Al-Nahrain University, Baghdad, Iraq.
-E-mail: atheel.n.al-khayyat@nahrainuniv.edu.iq}
-\thanks{R.~S. Abdulrahman is with the Department of Computer Engineering,
-Al-Nahrain University, Baghdad, Iraq.
-E-mail: ruslan.s.al-nuaimi@nahrainuniv.edu.iq}}
-
-\markboth{IEEE TRANSACTIONS ON NETWORKING, VOL.~X, NO.~X, 2026}{}
+% ── Journal name ──────────────────────────────────────────────────────────
+\journal{Ad Hoc Networks}
 
 \begin{document}
 
-\maketitle
+\begin{frontmatter}
 
-% ── Abstract ──────────────────────────────────────────────────────────────────
+\title{CARHy-WSN: A Context-Aware Hybrid Proactive-Reactive Routing Protocol for Heterogeneous IoT-Driven Wireless Sensor Networks}
+
+\author[nahrainCS]{Aymen Jaber Salman\corref{cor1}}
+\ead{aymen.j.salman@nahrainuniv.edu.iq}
+
+\author[nahrainCS]{Atheel Nowfal Alkhayyat}
+\ead{atheel.n.al-khayyat@nahrainuniv.edu.iq}
+
+\author[nahrainCS]{Ruslan Saad Abdulrahman}
+\ead{ruslan.s.al-nuaimi@nahrainuniv.edu.iq}
+
+\cortext[cor1]{Corresponding author.}
+\address[nahrainCS]{Department of Computer Engineering, Al-Nahrain University, Baghdad, Iraq}
+
 \begin{abstract}
 Wireless Sensor Networks (WSNs) deployed in IoT-driven smart city
 environments carry heterogeneous application traffic with fundamentally
@@ -57,28 +57,30 @@ under three traffic classes and a mixed-traffic scenario in a 100-node
 heterogeneous WSN simulation. Results demonstrate that CARHy-WSN
 achieves an 82.5\% reduction in Class~A emergency packet latency
 compared to AODV, a 70.2\% reduction in routing overhead compared to
-DSDV, and maintains a packet delivery ratio of 100\% across all evaluated
-scenarios, while preserving competitive energy balance
-throughout all tested configurations. A lightweight decision tree variant achieves 100\% classification
-accuracy with only 0.3\,KB memory overhead, enabling
-self-configuring deployment. CARHy-WSN prioritises simultaneous
-latency and overhead optimisation for safety-critical heterogeneous
-IoT deployments, achieving these gains within a deliberate
-network lifetime trade-off relative to lifetime-optimised baselines.
+DSDV, and maintains a packet delivery ratio of 100\% across all
+evaluated scenarios, while preserving competitive energy balance
+throughout all tested configurations. A lightweight decision tree
+variant achieves 100\% classification accuracy with only 0.3\,KB memory
+overhead, enabling self-configuring deployment. CARHy-WSN prioritises
+simultaneous latency and overhead optimisation for safety-critical
+heterogeneous IoT deployments, achieving these gains within a
+deliberate network lifetime trade-off relative to lifetime-optimised
+baselines.
 \end{abstract}
 
-% ── Keywords ──────────────────────────────────────────────────────────────────
-\begin{IEEEkeywords}
-Wireless sensor networks, context-aware routing, hybrid routing
-protocol, IoT, smart city, energy efficiency, QoS, heterogeneous
-traffic, MATLAB simulation.
-\end{IEEEkeywords}
+\begin{keyword}
+Wireless sensor networks \sep Context-aware routing \sep Hybrid routing protocol \sep IoT \sep Smart city \sep Energy efficiency \sep QoS \sep Heterogeneous traffic \sep MATLAB simulation
+\end{keyword}
+
+\end{frontmatter}
+
+\linenumbers
 
 % ── SECTION I ─────────────────────────────────────────────────────────────────
 \section{Introduction}
 \label{sec:intro}
 
-\IEEEPARstart{W}{ireless} Sensor Networks (WSNs) have emerged as a
+Wireless Sensor Networks (WSNs) have emerged as a
 foundational component of Internet of Things (IoT)-driven smart city
 infrastructure, enabling continuous and distributed monitoring across
 domains including environmental sensing, smart transportation,
@@ -289,9 +291,7 @@ delivery ratio, though the trust-based context dimension
 differs fundamentally from the urgency-energy-stability
 context vector proposed in CARHy-WSN.
 
-Smart city IoT routing has also received significant attention.
-Hanif~et~al.~\cite{hanif_opportunistically_2018} proposed
-opportunistic IoT-WSN integration for smart city routing.
+Smart city IoT routing has also received significant attention. Hanif et al.~\cite{hanif_opportunistically_2018} proposed opportunistic IoT-WSN integration for smart city deployments.
 Inga~et~al.~\cite{inga_novel_2021} addressed WSN sizing and
 routing for smart city deployments.
 Ekler~et~al.~\cite{ekler_energy_2022} proposed energy-aware
@@ -340,7 +340,7 @@ context-aware routing works.
 \caption{Comparison of CARHy-WSN with Related Context-Aware Routing Works}
 \label{tab:comparison}
 \centering
-\resizebox{\columnwidth}{!}{%
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccc}
 \hline
 \textbf{Protocol} & \textbf{Context} & \textbf{Mode} & \textbf{Traffic} &
@@ -674,7 +674,7 @@ encodes five rules derived from the following design principles:
 \caption{CARHy-WSN Mode-Switching Decision Table}
 \label{tab:decision}
 \centering
-\resizebox{\columnwidth}{!}{%
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccc}
 \hline
 \textbf{Class $U$} & \textbf{Energy $E_r^i$} & \textbf{Link $L_s^i$} & \textbf{Mode selected} \\
@@ -787,7 +787,7 @@ daanoune_intelligent_2026, lbeer2025}.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{fig_topology}
+\includegraphics[width=\textwidth]{fig_topology}
 \caption{Network deployment topology: $N=100$ heterogeneous sensor nodes
 distributed over a $200 \times 200$\,m$^2$ area. The base station (BS)
 is at $(100, 100)$\,m and the secondary sink at $(200, 100)$\,m. Node
@@ -894,7 +894,7 @@ improvement over DSDV.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{fig2_latency_classA}
+\includegraphics[width=\textwidth]{fig2_latency_classA}
 \caption{Mean Class~A emergency packet latency. CARHy-WSN achieves
 82.5\% reduction compared to AODV. Error bars show standard deviation
 across five independent runs.}
@@ -912,7 +912,7 @@ lower than all five baselines (all $p < 0.001$).
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{fig7_alive_nodes}
+\includegraphics[width=\textwidth]{fig7_alive_nodes}
 \caption{Number of alive nodes over time for all six protocols under
 the mixed-traffic scenario. CARHy-WSN, AODV, DSDV, and ZRP exhibit
 similar lifetime profiles (FND $\approx$ 34), while EH-Routing
@@ -925,7 +925,7 @@ disadvantaged relative to the three classical baselines.}
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{fig5_routing_overhead}
+\includegraphics[width=\textwidth]{fig5_routing_overhead}
 \caption{Routing overhead (control packets per data packet).
 CARHy-WSN achieves the lowest overhead, with 70.2\% reduction
 vs.\ DSDV.}
@@ -983,7 +983,7 @@ a routing efficiency deficiency.
 \caption{Network Lifetime and Key Metrics --- Mixed Traffic}
 \label{tab:lifetime}
 \centering
-\resizebox{\columnwidth}{!}{%
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccccc}
 \hline
 \textbf{Protocol} & \textbf{FND} & \textbf{HND} &
@@ -1046,7 +1046,7 @@ protocols treat all traffic identically.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{fig4_energy_gini}
+\includegraphics[width=\textwidth]{fig4_energy_gini}
 \caption{Gini coefficient of energy consumption across protocols
 (lower is more balanced). All protocols achieve similar energy
 balance (0.186--0.195), confirming that CARHy-WSN's context-aware
@@ -1057,7 +1057,7 @@ nodes.}
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{fig6_throughput}
+\includegraphics[width=\textwidth]{fig6_throughput}
 \caption{Network throughput (packets delivered per round) under
 mixed traffic. Throughput rankings mirror the lifetime rankings
 in Table~\ref{tab:lifetime}, confirming that differences are
@@ -1166,7 +1166,7 @@ threshold tuning.
 \caption{Threshold Sensitivity Analysis --- Mixed Traffic}
 \label{tab:sensitivity}
 \centering
-\resizebox{\columnwidth}{!}{%
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{cccccc}
 \hline
 $T_E$ & $T_L$ & \textbf{LatA (ms)} & \textbf{Overhead} &
@@ -1288,7 +1288,7 @@ advantages hold under realistic channel conditions and
 hardware constraints.
 
 % ── References ────────────────────────────────────────────────────────────────
-\bibliographystyle{IEEEtran}
+\bibliographystyle{elsarticle-num}
 \bibliography{references}
 
 \end{document}
