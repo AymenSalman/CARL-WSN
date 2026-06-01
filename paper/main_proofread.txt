@@ -1,0 +1,1011 @@
+
+
+
+
+../figures/
+
+
+Ad Hoc Networks
+
+
+
+CARHy-WSN: A Context-Aware Hybrid Proactive-Reactive Routing Protocol for Heterogeneous IoT-Driven Wireless Sensor Networks
+
+[nahrainCS]Aymen Jaber Salmancor1
+aymen.j.salman@nahrainuniv.edu.iq
+
+[nahrainCS]Atheel Nowfal Alkhayyat
+atheel.n.al-khayyat@nahrainuniv.edu.iq
+
+[nahrainCS]Ruslan Saad Abdulrahman
+ruslan.s.al-nuaimi@nahrainuniv.edu.iq
+
+[cor1]Corresponding author.
+[nahrainCS]Department of Computer Engineering, Al-Nahrain University, Baghdad, Iraq
+
+
+Wireless Sensor Networks (WSNs) deployed in IoT-driven smart city
+environments carry heterogeneous application traffic with fundamentally
+different quality-of-service requirements. Existing hybrid routing
+protocols switch between proactive and reactive modes based on a single
+network metric, making them insensitive to application urgency and
+unable to simultaneously optimise energy consumption and end-to-end
+latency across different traffic classes. This paper proposes
+CARHy-WSN, a Context-Aware Hybrid Routing protocol that introduces a
+three-dimensional context vector - comprising application urgency
+class, normalised residual energy, and link stability score - to
+dynamically select the optimal routing mode per packet. CARHy-WSN is
+implemented in MATLAB and evaluated against five baseline protocols
+under three traffic classes and a mixed-traffic scenario in a 100-node
+heterogeneous WSN simulation. Results demonstrate that CARHy-WSN
+achieves an 82.5% reduction in Class A emergency packet latency
+compared to AODV, a 70.2% reduction in routing overhead compared to
+DSDV, and maintains a packet delivery ratio of 100% across all
+evaluated scenarios, while preserving competitive energy balance
+throughout all tested configurations. A lightweight decision tree
+variant achieves 100% classification accuracy with only 0.3KB memory
+overhead, enabling self-configuring deployment. CARHy-WSN prioritises
+simultaneous latency and overhead optimisation for safety-critical
+heterogeneous IoT deployments, achieving these gains within a
+deliberate network lifetime trade-off relative to lifetime-optimised
+baselines.
+
+
+Wireless sensor networks Context-aware routing Hybrid routing protocol IoT Smart city Energy efficiency QoS Heterogeneous traffic MATLAB simulation
+
+
+
+
+Introduction
+
+Wireless Sensor Networks (WSNs) have emerged as a
+foundational component of Internet of Things (IoT)-driven smart city
+infrastructure, enabling continuous and distributed monitoring across
+domains including environmental sensing, smart transportation,
+industrial automation, and emergency response .
+As smart city deployments scale in both node density and application
+diversity, the routing protocols governing data delivery face
+increasing pressure to simultaneously satisfy conflicting requirements:
+energy efficiency, low latency, reliability, and adaptability to
+dynamic network conditions.
+
+Existing routing approaches broadly fall into three categories.
+Proactive protocols, such as DSDV  and
+OLSR , maintain routing tables continuously,
+delivering low latency at the cost of high energy overhead from
+periodic updates. Reactive protocols, such as AODV  and
+DSR , discover routes on demand, conserving
+energy in sparse networks but introducing significant route
+discovery delays that are intolerable
+for time-critical applications. Hybrid protocols, such as
+ZRP , partition the network into zones and apply
+different modes within and across zone boundaries. However, ZRP and
+its variants rely on a fixed zone radius parameter and remain
+insensitive to the nature of the traffic being routed.
+
+In a realistic smart city WSN, a single node may simultaneously
+generate emergency alerts requiring sub-100ms delivery, periodic
+telemetry with a 30-second tolerance, and event-driven uploads with
+best-effort requirements. No existing protocol adapts its routing
+behaviour to the urgency class of individual packets. This
+application-blindness leads to systematic inefficiency: proactive
+routing wastes energy on low-urgency telemetry, while reactive routing
+introduces dangerous delays on emergency traffic.
+
+A 2025 comprehensive survey of context-aware routing in
+IoT-driven WSNs  explicitly identifies
+dynamic application-context-based hybrid mode switching as
+an open research direction, noting that reactive and hybrid
+context-aware approaches have received significantly less
+attention than proactive ones. No published protocol uses
+a joint multi-dimensional context vector - comprising
+application urgency, residual energy, and link stability
+simultaneously - to trigger full routing paradigm switching.
+This paper addresses that gap directly.
+
+The main contributions of this paper are as follows:
+
+    A three-dimensional context vector
+     comprising application urgency
+    class , normalised residual energy , and link stability
+    score , and a mode-switching decision table that maps each
+    context combination to the optimal routing mode.
+
+    CARHy-WSN, the first WSN hybrid routing protocol that
+    performs per-packet routing mode selection based on a joint
+    three-dimensional context vector, requiring under 0.1ms
+    classification latency and under 2KB RAM overhead per node.
+
+    Evaluation under three simultaneous heterogeneous IoT
+    traffic classes, providing the first routing comparison under
+    realistic smart city mixed-traffic conditions.
+
+    Validation that a lightweight decision tree classifier
+(depth 3, 0.3KB memory, 7 comparisons per packet) learns
+the context-switching rules with 100% test accuracy and
+99.96% cross-validation accuracy, demonstrating the
+feasibility of a self-configuring deployment that requires
+no manual threshold tuning.
+
+The remainder of this paper is organised as follows.
+Section  reviews related work.
+Section  presents the system model.
+Section  describes the CARHy-WSN protocol design.
+Section  presents the simulation setup.
+Section  presents and analyses the results.
+Section  discusses key findings and limitations.
+Section  concludes the paper.
+
+
+
+Related Work
+
+Proactive and Reactive Routing Protocols
+
+Routing protocols for WSNs and ad hoc networks have been broadly
+classified into proactive and reactive categories, each with
+distinct performance trade-offs that make neither approach
+universally optimal for heterogeneous IoT deployments.
+
+Routing protocols for WSNs have been extensively surveyed and
+classified .
+Proactive protocols maintain routing tables continuously through
+periodic broadcasts. DSDV  established the
+foundational destination-sequenced distance-vector approach,
+guaranteeing loop-free routes at all times. OLSR extended this paradigm through multipoint relay (MPR) selection,
+substantially reducing flooding overhead in dense networks.
+While proactive protocols deliver consistently low latency by
+eliminating route discovery delays, their continuous maintenance
+overhead leads to significant energy waste on low-traffic
+nodes .
+
+Reactive protocols discover routes exclusively on demand.
+AODV  pioneered this approach by initiating
+route requests only when data must be transmitted, conserving
+energy in sparse or low-traffic conditions. However, the
+route discovery delay of 20-100ms introduced by RREQ/RREP
+flooding renders reactive protocols unsuitable for
+latency-sensitive applications .
+A comparative analysis by Nurul Hidayah et al. confirmed that neither proactive nor reactive protocols alone
+achieve optimal performance across varying network conditions,
+motivating the need for adaptive hybrid approaches.
+Recent work  demonstrated
+that AODV, DSDV, and DSR all exhibit significant performance
+degradation under heterogeneous traffic loads, highlighting
+the fundamental limitation of single-mode routing for
+IoT-driven smart city deployments.
+
+Hybrid Routing Protocols
+
+Hybrid protocols attempt to combine the latency advantages of
+proactive routing with the energy efficiency of reactive routing.
+ZRP  pioneered zone-based hybrid routing by
+maintaining proactive routes within a fixed-radius zone and
+using reactive inter-zone routing for destinations beyond the
+zone boundary. While ZRP reduces control overhead compared to
+purely proactive protocols, its fixed zone radius is configured
+statically and does not adapt to node energy state or traffic
+urgency - a fundamental limitation that CARHy-WSN addresses
+directly.
+
+Subsequent hybrid approaches incorporated additional optimisation
+dimensions. Chaurasiya et al. proposed a hybrid clustering technique for multilevel heterogeneous
+IoT WSNs, combining cluster-based organisation with multi-hop
+routing to reduce energy consumption. Lei proposed a hybrid energy-aware approach combining particle swarm
+optimisation with fuzzy clustering for IoT routing, demonstrating
+52% energy reduction compared to DEEC, though at the cost of
+requiring offline training data for the fuzzy membership functions.
+Srinivasa Babu et al. proposed a neuro-fuzzy hybrid routing scheme for IoT that
+incorporates context-like features, but similarly requires a
+trained model that cannot adapt at runtime without retraining.
+Nadanam et al.  recently proposed a
+quantum-optimised hybrid routing framework achieving 30%
+energy reduction, though the computational complexity of quantum
+optimisation makes it unsuitable for resource-constrained sensor
+hardware. Sudha et al.  combined
+Q-learning with machine learning for cluster head selection and
+routing in 5G-enabled WSNs, demonstrating improved throughput
+over LEACH, but without considering per-packet application
+urgency as a routing criterion.
+
+A common limitation across all these hybrid approaches is that
+mode selection or routing decisions are made based on a single
+optimisation objective - typically energy or load - without
+awareness of the application-level urgency of the traffic being
+routed.
+
+Context-Aware Routing in IoT-WSNs
+
+Context-aware computing for IoT was formally defined by
+Perera et al. , who identified five
+contextual dimensions - identity, location, activity, time,
+and relations - as fundamental to intelligent IoT decision
+making. This foundational work motivates the use of contextual
+information in routing decisions, though the specific application
+to WSN hybrid routing mode selection had not been addressed
+until recently.
+
+Context-aware routing has since been applied across several IoT
+and WSN domains. Monteiro et al. proposed context-aware network selection in heterogeneous wireless
+networks, demonstrating that context-driven decisions outperform
+static policies, but their work focused on network selection
+rather than intra-WSN routing mode switching.
+Akpakwu et al.  proposed a
+context-aware congestion control scheme for CoAP/UDP IoT
+networks, applying context sensing to transport-layer decisions
+rather than routing.
+Sithik and Kumar  proposed a
+multi-context aware parent selection scheme for the RPL
+protocol using grey set theory, incorporating multiple
+contextual parameters into routing metric computation.
+However, their approach targets RPL parent selection exclusively
+and does not implement dynamic switching between fundamentally
+different routing modes (proactive, reactive, and hybrid)
+based on application urgency class. Unlike Sithik and
+Kumar , who optimise a single
+routing metric within RPL, CARHy-WSN introduces a
+three-dimensional context vector that triggers full routing
+paradigm switching - the first such mechanism reported in
+the WSN routing literature.
+Karagiannis et al. proposed context-aware routing for fog computing systems,
+reducing latency by 23% and hop count by 73% through
+context-driven forwarding decisions. Their work operates
+at the fog layer rather than the WSN sensor layer, and
+does not model heterogeneous traffic classes with
+conflicting QoS requirements.
+Hasan et al.  proposed a
+context-aware trust prediction framework for opportunistic
+IoT routing using Bayesian inference, achieving 88.9%
+delivery ratio, though the trust-based context dimension
+differs fundamentally from the urgency-energy-stability
+context vector proposed in CARHy-WSN.
+
+Smart city IoT routing has also received significant attention. Hanif et al.  proposed opportunistic IoT-WSN integration for smart city deployments.
+Inga et al.  addressed WSN sizing and
+routing for smart city deployments.
+Ekler et al.  proposed energy-aware
+IoT routing algorithms specifically for smart city environments.
+Karunkuzhali et al. 
+ proposed QoS-aware routing
+frameworks for IoT-WSNs in smart cities, demonstrating that
+multi-class service differentiation improves network performance.
+However, none of these works implement dynamic routing mode
+switching based on per-packet application urgency.
+El-Fouly et al. proposed environment-aware real-time routing for multi-sink
+WSNs in smart cities, incorporating deadline constraints and
+link quality metrics. While this work shares the multi-sink
+topology with our prior work  and considers
+real-time delivery requirements, it does not model
+heterogeneous application urgency classes or implement
+context-driven mode switching.
+
+Recent surveys confirm that AI-assisted and context-aware
+routing are among the most active research frontiers in
+IoT-WSN networking.
+Priyadarshi  reviewed
+meta-heuristic and AI-based routing approaches, while
+Priyadarshi  further examined
+AI-driven routing improvements for energy efficiency and
+reliability.
+Saadallah and Alabady identified energy-efficient context-sensitive routing as an
+open challenge in their comprehensive IoT routing study.
+Yilmaz et al.  highlighted the
+integration of ML and AI into WSN routing as a key trend for
+5G/6G sustainable communication.
+Daanoune and Baghdad  recently
+proposed a reinforcement learning-based clustering and routing
+protocol (RLCR) for heterogeneous WSNs, demonstrating the
+potential of AI-driven approaches for adaptive routing, though
+without application-context awareness in mode selection.
+
+Table  summarises the key distinguishing
+features of CARHy-WSN compared to the most closely related
+context-aware routing works.
+
+
+Comparison of CARHy-WSN with Related Context-Aware Routing Works
+
+
+
+Research Gaps
+
+The preceding review reveals four specific gaps that motivate
+CARHy-WSN. First, Khedr et al.  conducted
+the first comprehensive survey of context-aware routing in
+IoT-driven WSNs and explicitly identified dynamic
+application-context-based mode switching as an open research
+direction, noting that reactive and hybrid context-aware methods
+have received significantly less attention than proactive
+approaches. Second, Kumar et al. identified application-context awareness as an emerging
+research gap through a bibliometric analysis of
+energy-efficient routing in IoT WSNs spanning 2015-2024.
+Third, Chu et al. ,
+Khanna et al. , and
+Prashanth et al.  all noted that routing
+adaptation in heterogeneous WSNs remains dominated by
+single-objective optimisation approaches that cannot
+simultaneously satisfy the conflicting requirements of
+heterogeneous application traffic classes.
+Fourth, no published protocol uses a joint three-dimensional
+context vector comprising application urgency, residual energy
+ratio, and link stability score to dynamically select between
+proactive, reactive, and hybrid routing modes on a per-packet
+basis - the specific contribution of CARHy-WSN introduced
+in this paper.
+
+
+System Model
+
+Network Topology
+
+Consider a WSN comprising  heterogeneous sensor nodes deployed
+randomly over a square area of side length m according to a
+uniform distribution. Let  denote
+the set of all nodes. A base station (BS) is located at the centre of
+the deployment area, and a secondary sink node is positioned at the
+right boundary, consistent with the multi-sink topology in our prior
+work . Both the BS and sink are assumed to have
+unconstrained energy. Each sensor node  is
+characterised by a fixed position  and a
+heterogeneous initial energy  drawn from a uniform distribution
+, reflecting the reality
+of diverse sensor hardware in smart city deployments .
+
+A node  is considered alive if its residual energy
+ at simulation round , and dead otherwise.
+Dead nodes neither transmit nor receive. The network is considered
+operational as long as at least one node remains alive and connected
+to the BS.
+
+Traffic Model
+
+Smart city IoT deployments generate heterogeneous application traffic
+with fundamentally different QoS requirements. This paper models
+three traffic classes simultaneously:
+
+
+    Class A - Emergency traffic: Generated by
+    safety-critical sensors such as fire detectors, intrusion alarms,
+    and accident monitors. Modelled as a Poisson process with arrival
+    rate . Strict latency requirement: end-to-end delay
+    must not exceed 100ms.
+
+    Class B - Periodic telemetry: Generated by
+    environmental sensors reporting temperature, humidity, air quality,
+    and energy consumption. Modelled as a deterministic periodic
+    process with one packet per minute. Tolerates delays up to
+    30seconds.
+
+    Class C - Event-driven uploads: Generated by
+    motion detectors, occupancy sensors, and camera triggers.
+    Modelled as a Poisson process with arrival rate .
+    Best-effort delivery with no hard latency constraint.
+
+Each packet carries a class tag  in its header,
+which is read by the context classifier at the transmitting node
+before routing decisions are made.
+
+Channel and Energy Model
+
+Wireless communication is modelled using the first-order radio energy
+model , which captures the dominant sources of
+energy consumption in sensor nodes: electronics and amplification.
+The energy consumed by node  to transmit an -bit packet to a
+receiver at distance  is:
+
+
+
+where m is the crossover distance between free-space and
+multipath propagation models.
+The energy consumed to receive an -bit packet is:
+
+
+
+The residual energy of node  after a transmission round is:
+
+
+
+subject to .
+
+Link Stability Model
+
+To capture dynamic link quality variations, CARHy-WSN maintains a
+per-node link stability score , computed
+as an Exponential Weighted Moving Average (EWMA) of the ACK success
+history over a sliding window of  most recent transmissions:
+
+
+
+where  is the ACK outcome of the
+-th most recent transmission from node , and
+ are normalised exponentially
+decaying weights with smoothing factor  and
+normalisation constant .
+
+Performance Metrics
+
+Network lifetime: The First Node Death round
+ and the
+Half Node Death round
+.
+
+Packet Delivery Ratio:
+
+
+Energy balance (Gini coefficient):
+
+where  is the energy consumed by node , sorted
+in ascending order ().
+A lower  indicates more uniform energy consumption.
+
+Routing overhead:
+
+where  is the total number of routing control
+packets generated during the simulation.
+
+
+CARHy-WSN Protocol Design
+
+Design Motivation
+
+Existing hybrid routing protocols such as ZRP determine routing mode based on a single criterion - typically
+geographic zone membership defined by a fixed hop-count radius.
+This design is application-blind: a proactive route maintained for
+a best-effort sensor reading consumes the same energy as one
+maintained for an emergency alert, despite their vastly different
+urgency levels. CARHy-WSN addresses this by introducing a
+three-dimensional context vector that jointly considers
+application urgency, node energy state, and link quality before
+each routing decision.
+
+The Context Vector
+
+For each packet to be transmitted by node  of class , the
+context vector  is
+computed, where:
+
+
+     is the urgency class read
+    directly from the packet header. Zero additional computation
+    is required.
+
+     is the
+    normalised residual energy ratio. 
+    indicates full energy;  indicates
+    near-depletion. A node is classified as energy-critical
+    when .
+
+     is the link stability score
+    computed using (). A link is classified as
+    unstable when . Algorithm  presents the complete per-packet
+routing procedure, showing how the three context dimensions
+are computed and mapped to routing actions in 
+classification time.
+
+
+
+Mode-Switching Decision Table
+
+The context vector is mapped to one of three routing modes
+using the decision table in Table . The table
+encodes five rules derived from the following design principles:
+
+
+    Emergency traffic must never wait for route
+    discovery. Class A packets always use proactive mode,
+    regardless of energy or link state, to guarantee sub-100ms
+    delivery.
+
+    Healthy nodes on stable links should conserve
+    energy. When both  and ,
+    reactive mode is selected for Class B and C traffic, avoiding
+    the overhead of continuous table maintenance.
+
+    Energy-critical nodes should reduce broadcast
+    overhead. When , hybrid mode is selected for
+    Class B traffic, shrinking the proactive zone to reduce
+    maintenance cost while preserving near-zone route availability.
+
+    Unstable links require pre-built alternate routes.
+    When , proactive mode is selected to ensure
+    cached alternate paths exist, avoiding repeated failed reactive
+    route discoveries.
+
+    Best-effort traffic on degraded nodes defers
+    transmission. Class C traffic on energy-critical, link-unstable
+    nodes uses reactive mode with exponential backoff, accepting
+    higher latency to preserve the node's remaining energy.
+
+
+CARHy-WSN Mode-Switching Decision Table
+
+
+
+Routing Modes
+
+Proactive Mode
+Inspired by DSDV , proactive mode maintains
+routing tables through periodic broadcasts every round. When a
+packet requires transmission, the next hop toward the BS is
+retrieved immediately from the pre-built table - eliminating
+route-discovery latency entirely. The energy overhead includes
+both data transmission cost and a table maintenance overhead of
+10% of the data packet energy per round. This mode is mandatory
+for Class A emergency traffic.
+
+Reactive Mode
+Inspired by AODV , reactive mode initiates
+route discovery only when a packet needs to be sent. A Route
+Request (RREQ) is flooded to all neighbours within transmission
+range, and a Route Reply (RREP) is returned along the reverse path.
+This eliminates periodic broadcast overhead but introduces route
+discovery delay of 20-50ms. Reactive mode is preferred for
+Class B and C traffic on healthy nodes with stable links.
+
+Hybrid Mode
+CARHy-WSN's hybrid mode extends ZRP  with a
+key innovation: the proactive zone radius adapts dynamically based
+on the node's residual energy ratio :
+
+
+
+Within the zone radius, proactive routing is used (routes
+pre-built). Beyond the zone radius, reactive inter-zone routing
+(IERP) is used. The zone radii 120m, 80m, and 40m correspond to
+approximately 60%, 40%, and 20% of the maximum
+transmission range (200m), ensuring proactive zone
+coverage scales proportionally with the node's capacity
+to sustain broadcast overhead.
+
+Overhead Analysis
+
+The per-packet control overhead  of CARHy-WSN adapts
+to the selected mode:
+
+
+
+where  is the number of one-hop neighbours
+within 100m range. By selecting reactive mode for the majority
+of Class B and C traffic, CARHy-WSN avoids the continuous
+broadcast overhead that makes purely proactive protocols
+(DSDV:  per packet) energy-intensive.
+
+Computational Complexity
+
+The context classifier operates in  time per packet: urgency
+class  is read from the packet header in constant time, 
+is a single division operation, and  is computed as a
+fixed-length dot product of ten values. The total per-packet
+classification overhead is under 0.1ms on any modern sensor
+processor and requires under 2KB of RAM for the ACK history
+buffer - making CARHy-WSN deployable on resource-constrained
+hardware without modification.
+
+
+Simulation Setup
+
+Network Model
+The simulation models a smart city IoT-WSN deployment comprising
+ heterogeneous sensor nodes randomly distributed over a
+m area using a uniform random distribution.
+A base station is positioned at the centre of the
+deployment area at coordinates m, and a secondary
+sink is placed at m, as illustrated in
+Fig. , consistent with the multi-sink
+topology established in our prior work .
+Nodes are initialised with heterogeneous energy levels drawn from a
+uniform distribution J.
+MATLAB-based simulation is a well-established and widely accepted
+methodology for WSN routing protocol evaluation, as demonstrated
+by recent published studies 
+.
+
+
+Network deployment topology:  heterogeneous sensor nodes
+distributed over a m area. The base station (BS)
+is at m and the secondary sink at m. Node
+colour indicates initial energy J.
+The dashed circle shows the 100m communication range around the BS.
+
+
+Energy Model
+The first-order radio energy model  is
+adopted, following () and () as
+defined in Section , with parameters listed
+in Table .
+
+Traffic Classes
+Three IoT application traffic classes are simulated simultaneously:
+
+    Class A (Emergency): Poisson arrivals,
+    packets/s, latency requirement ms.
+    Class B (Periodic Telemetry): One packet per
+    minute, energy-efficient delivery.
+    Class C (Event-Driven): Poisson arrivals,
+    packets/s, best-effort delivery.
+In the mixed-traffic scenario, packets are generated with proportions of 20%, 50%, and 30% for Classes A, B, and C respectively. In all four scenarios (Class A only, Class B only, Class C only, and Mixed), the total traffic volume per round is held constant - only the class composition varies. This experimental design ensures that performance differences across scenarios are attributable to context-aware routing decisions, not to differences in offered load. Consequently, baseline protocols that do not differentiate traffic classes produce identical performance across all scenarios, while CARHy-WSN's metrics vary as the context classifier selects different routing modes for different class compositions. 
+These proportions reflect a realistic
+smart city IoT deployment in which emergency events are
+infrequent, periodic environmental monitoring dominates
+network traffic, and event-driven sensing forms an
+intermediate tier .
+
+Simulation Parameters
+Table  summarises all simulation
+parameters used in this study.
+
+
+Simulation Parameters
+
+
+Baseline Protocols
+CARHy-WSN is evaluated against five baseline protocols:
+(1) AODV , (2) DSDV ,
+(3) ZRP , (4) EH-Routing ,
+and (5) MSLBA . AODV, DSDV, and ZRP are
+selected as the canonical representatives of the three routing
+paradigms (reactive, proactive, and hybrid) between which
+CARHy-WSN switches, enabling direct evaluation of whether
+context-aware mode selection outperforms each individual paradigm.
+EH-Routing and MSLBA are included as domain-specific baselines
+sharing the same heterogeneous energy model and multi-sink
+topology. The context-aware works surveyed in Table operate at different protocol layers (RPL parent selection, fog
+forwarding, opportunistic trust routing) and are therefore not
+directly comparable under the same WSN simulation framework.
+
+Performance Metrics
+Eight metrics are evaluated:
+(1) First Node Death round (FND),
+(2) Half Node Death round (HND),
+(3) Packet Delivery Ratio (PDR),
+(4) Mean Class A latency,
+(5) Average energy consumption per round,
+(6) Gini coefficient for energy balance,
+(7) Routing overhead, and
+(8) Network throughput.
+All results are reported as mean  standard deviation across
+five independent runs.
+
+
+Results and Analysis
+
+Class A Emergency Packet Latency
+Fig.  presents the mean Class A emergency packet
+latency under the mixed-traffic scenario. CARHy-WSN achieves a mean
+latency of 17.5ms, representing an 82.5%
+reduction compared to AODV (100.0ms). This validates the core
+design decision: Class A packets are always routed via proactive
+mode, eliminating route-discovery delay entirely. One-way ANOVA confirms that latency differences across all
+six protocols are statistically significant
+(, ). Tukey HSD post-hoc
+analysis confirms CARHy-WSN achieves significantly lower
+Class A latency than AODV, ZRP, EH-Routing, and MSLBA
+(all ). The low latency variance across seeds (ms) reflects the deterministic nature of proactive routing: since Class A packets always use pre-built routing tables, latency is dominated by the fixed table-lookup cost rather than topology-dependent route discovery. Notably, CARHy-WSN and DSDV are
+statistically tied on latency (ms,
+) since both route Class A traffic via proactive
+mode - however CARHy-WSN achieves this with 70.2%
+lower routing overhead, demonstrating a clear Pareto
+improvement over DSDV.
+
+
+Mean Class A emergency packet latency. CARHy-WSN achieves
+82.5% reduction compared to AODV. Error bars show standard deviation
+across five independent runs.
+
+Routing Overhead
+CARHy-WSN achieves the lowest overhead of 1.87 control
+packets per data packet - a 70.2% reduction vs. DSDV
+(6.27), 41.0% reduction vs. AODV (3.16), and
+38.6% reduction vs. MSLBA (3.04), as shown in Fig. . One-way ANOVA confirms overhead differences are
+statistically significant (, ).
+Tukey HSD confirms CARHy-WSN overhead is significantly
+lower than all five baselines (all ).
+
+
+Number of alive nodes over time for all six protocols under
+the mixed-traffic scenario. CARHy-WSN, AODV, DSDV, and ZRP exhibit
+similar lifetime profiles (FND  34), while EH-Routing
+extends lifetime through energy-aware relay selection. The comparable
+decline rates confirm that CARHy-WSN's FND is not uniquely
+disadvantaged relative to the three classical baselines.
+
+
+
+Routing overhead (control packets per data packet).
+CARHy-WSN achieves the lowest overhead, with 70.2% reduction
+vs. DSDV.
+
+Packet Delivery Ratio
+All six protocols achieve a PDR of 100% under all traffic scenarios,
+confirming correct implementation and sufficient network density.
+The uniform 100% PDR reflects the high network connectivity of the
+m deployment with  nodes; sparser deployments
+or realistic link failure models may differentiate PDR performance
+across protocols.
+
+
+Network Lifetime
+
+Table  presents the FND and HND results
+across all protocols. EH-Routing achieves the longest network
+lifetime (FND = 787, HND = 1432), as it was specifically
+designed to maximise node lifetime by always selecting the
+highest-residual-energy relay. CARHy-WSN (FND = 34,
+HND = 741) does not optimise for lifetime alone - this is a
+deliberate design trade-off that is discussed fully in
+Section . Fig.  confirms
+that CARHy-WSN, AODV, DSDV, and ZRP all exhibit similar
+lifetime profiles (FND  34), demonstrating that
+CARHy-WSN's lifetime is consistent with the same class of
+protocols rather than uniquely disadvantaged. CARHy-WSN balances latency,
+energy, and reliability simultaneously across heterogeneous
+traffic classes, whereas EH-Routing achieves long lifetime at the cost of
+high Class A latency (47.5ms) - a 171% increase over
+CARHy-WSN's 17.5ms - and elevated routing overhead (4.50),
+rendering it unsuitable for emergency IoT deployments with
+sub-100ms latency requirements.
+
+Table  also reports average energy consumption and
+throughput. CARHy-WSN consumes 0.105J per round - higher than
+DSDV (0.093J) and MSLBA (0.071J) - because proactive mode
+incurs table maintenance overhead on every Class A packet regardless
+of node energy state. This is the energy cost of guaranteeing
+sub-100ms emergency latency; baselines that achieve lower per-round
+energy do so at the expense of either high latency (AODV: 100ms)
+or high routing overhead (DSDV: 6.27). Similarly, CARHy-WSN's
+throughput (36.9pkts/round) is lower than DSDV (41.7) and
+EH-Routing (70.3) primarily because EH-Routing's longer network
+lifetime enables more nodes to remain active and generate traffic
+across the full 2000-round simulation. This throughput difference
+is therefore a direct consequence of the lifetime trade-off, not
+a routing efficiency deficiency.
+
+
+
+Network Lifetime and Key Metrics - Mixed Traffic
+
+
+
+
+Summary of Improvements
+
+
+CARHy-WSN Improvement over Baselines
+
+
+CARHy-WSN is the only protocol achieving near-optimal
+Class A latency and lowest routing overhead simultaneously
+across all evaluated protocols. Fig.  shows
+that the Gini coefficient for energy consumption ranges from
+0.186 (CARHy-WSN) to 0.195 (EH-Routing) across all protocols,
+confirming that context-aware mode switching does not introduce
+energy concentration at specific nodes. Fig. presents the per-round throughput, where EH-Routing leads due
+to its extended network lifetime; the throughput ranking
+mirrors the lifetime ranking (Table ),
+confirming that throughput differences are driven by node
+survival rather than per-packet routing efficiency.
+
+CARHy-WSN's overhead varies across traffic scenarios -
+2.51 for Class A only, 1.59 for Class B only, 1.90 for
+Class C only, and 1.87 for Mixed - while all five
+baselines produce constant overhead regardless of traffic
+composition. This confirms that CARHy-WSN actively adapts
+its routing behaviour to traffic class, whereas baseline
+protocols treat all traffic identically.
+
+
+Gini coefficient of energy consumption across protocols
+(lower is more balanced). All protocols achieve similar energy
+balance (0.186-0.195), confirming that CARHy-WSN's context-aware
+mode switching does not concentrate energy consumption at specific
+nodes.
+
+
+Network throughput (packets delivered per round) under
+mixed traffic. Throughput rankings mirror the lifetime rankings
+in Table , confirming that differences are
+driven by node survival duration rather than per-packet routing
+efficiency.
+
+
+Decision Tree Classifier Validation
+
+To validate Contribution 4, a lightweight decision tree
+classifier was trained on 10,000 synthetically generated
+context vectors labelled by the rule-based oracle.
+The feature vector comprises the three context dimensions
+ and the target is one of three routing
+modes proactive, reactive, hybrid.
+
+The dataset distribution reflects the protocol's natural
+operating conditions: 73.8% proactive (dominated by
+Class A emergency traffic), 16.1% reactive, and 10.1%
+hybrid. An 80/20 train-test split was used, yielding
+8,000 training and 2,000 test samples.
+
+The trained decision tree (7 leaves, 0.3KB memory,
+7 comparisons per packet) achieves 100% test
+set accuracy across all three routing mode classes, with
+a 5-fold cross-validation accuracy of 99.96%
+(cross-validation error: 0.0004). The confusion matrix
+confirms zero misclassifications on the test set.
+
+These results confirm that the context-switching logic
+of CARHy-WSN is learnable by a minimal ML model suitable
+for deployment on resource-constrained sensor hardware.
+A self-configuring variant could learn the threshold
+parameters  and  from observed network behaviour
+without manual configuration - an important practical
+advantage for large-scale smart city deployments.
+The computational cost of the decision tree (7 comparisons,
+ms latency, 0.3KB RAM) is negligible compared
+to the packet transmission and reception energy costs,
+confirming its deployability on standard sensor hardware.
+
+
+Discussion
+
+Design Trade-offs
+
+The most notable trade-off in CARHy-WSN is network
+lifetime versus latency-overhead optimisation. EH-Routing
+achieves a significantly longer network lifetime
+(FND = 787 vs. CARHy FND = 34) because it always selects
+the highest-residual-energy relay, concentrating traffic
+load on energy-rich nodes and preserving the overall
+network energy budget. CARHy-WSN does not optimise for
+lifetime alone: it routes Class A traffic via proactive
+mode regardless of relay energy state, and routes
+Class B and C traffic via the energy-cheapest mode
+given current context. This design is intentional -
+in smart city deployments, a 47.5ms emergency response
+latency (EH-Routing) is unacceptable for fire alarms or
+accident detection, where the 100ms hard deadline
+must be guaranteed. CARHy-WSN delivers 17.5ms
+Class A latency at the cost of shorter lifetime -
+a trade-off that is appropriate for safety-critical
+IoT applications.
+
+Future work can address this trade-off by incorporating
+energy harvesting awareness into the context vector,
+extending the  dimension with a harvesting rate
+forecast - directly connecting CARHy-WSN to the
+energy-harvesting routing work in .
+
+Threshold Sensitivity
+
+The CARHy-WSN context classifier uses two threshold
+parameters: the energy threshold  and the
+link stability threshold . These values were
+selected based on established WSN energy depletion
+behaviour  and standard IEEE 802.15.4
+link reliability benchmarks respectively. The decision
+tree validation results (99.96% cross-validation
+accuracy) confirm that the switching boundaries learned
+from these thresholds generalise well across unseen
+context vectors, suggesting that the default values
+are robust for a wide range of deployment conditions.
+Table  confirms this robustness empirically.
+Across all nine tested combinations of 
+and , CARHy-WSN maintains a Class A
+latency of 17.5ms and routing overhead between 1.86 and 1.87
+in all configurations - corresponding to a latency reduction of
+82.5% versus AODV and an overhead reduction of 70.2-70.3% versus
+DSDV across all nine threshold pairs. This near-invariance arises
+because Rule 1 (Class A  proactive) is unconditional
+on both thresholds, and the overhead is dominated by the proactive
+maintenance cost, which is threshold-independent. Practitioners
+deploying CARHy-WSN in environments with significantly different
+energy profiles or channel conditions can therefore use the default
+thresholds with confidence, or retrain the decision tree variant
+using locally observed context data - requiring no manual
+threshold tuning.
+
+
+Threshold Sensitivity Analysis - Mixed Traffic
+
+
+
+
+Practical Deployment Considerations
+
+CARHy-WSN requires each node to maintain an ACK history
+buffer of  entries (80 bytes) and compute an
+EWMA over this buffer per packet. The total per-node
+memory overhead is under 100 bytes beyond the standard
+routing table, making the protocol suitable for
+deployment on widely available sensor platforms
+including TelosB, MicaZ, and Arduino-class devices.
+The proactive routing table is refreshed every round,
+which in a 2000-round simulation corresponds to the
+full network operational lifetime - in practice, the refresh interval should be aligned to
+the network's expected round duration.
+
+Regarding scalability, CARHy-WSN's context classifier
+operates in  time per packet regardless of network
+size , as urgency class  is read directly from the
+packet header,  requires a single division, and
+ is a fixed-length dot product over  values.
+The proactive routing table scales  in memory, which
+is standard for all proactive protocols and acceptable for
+the node densities typical of smart city WSN deployments.
+Critically, CARHy-WSN's overhead advantage over DSDV is
+expected to increase with larger : as network density
+grows, DSDV must broadcast routing updates to an increasing
+number of neighbours every round, while CARHy-WSN suppresses
+these broadcasts for Class B and C traffic by selecting
+reactive mode - meaning the absolute overhead saving per
+packet grows proportionally with neighbour density, amplifying
+the 70.2% reduction demonstrated at .
+
+Limitations
+
+This study has four limitations that should be
+acknowledged. First, the simulation uses a simplified
+propagation model (first-order radio energy model)
+that does not capture multipath fading, shadowing,
+or interference from co-deployed networks. Second,
+node mobility is not modelled - all nodes are
+static after deployment. Third, the latency values
+are simulated rather than measured on physical
+hardware. Fourth, all results are reported for a single
+network size (); scalability to larger deployments
+() is left for future validation.
+Future work should validate CARHy-WSN
+on a real sensor testbed (e.g. Raspberry Pi or
+Arduino with IEEE 802.15.4 radios) to confirm that
+the simulated latency advantages hold under realistic
+channel conditions.
+
+
+Conclusion
+
+This paper presented CARHy-WSN, a Context-Aware Hybrid
+Proactive-Reactive Routing Protocol for heterogeneous
+IoT-driven Wireless Sensor Networks. CARHy-WSN introduces
+a three-dimensional context vector  that jointly considers application urgency
+class, normalised residual energy, and link stability
+to dynamically select the optimal routing mode per
+packet - the first such mechanism reported in the
+WSN routing literature.
+
+MATLAB-based simulation across six protocols, four
+traffic scenarios, and five independent runs demonstrated
+that CARHy-WSN achieves an 82.5% reduction
+in Class A emergency packet latency compared to AODV
+(), a 70.2% reduction in routing
+overhead compared to DSDV (), and a
+100% packet delivery ratio across all evaluated
+scenarios. CARHy-WSN is the only evaluated protocol that simultaneously
+achieves near-optimal emergency latency and minimum routing
+overhead - a Pareto improvement over all five baselines in the
+latency-overhead plane, including DSDV which matches
+CARHy-WSN on latency but generates 70.2% higher routing
+overhead, confirming that CARHy-WSN occupies the optimal
+operating point on the latency-overhead trade-off frontier.
+This improvement is achieved within a deliberate network
+lifetime trade-off: CARHy-WSN prioritises sub-100ms
+emergency response over maximum node survival, an appropriate
+design choice for safety-critical IoT deployments. A lightweight
+decision tree variant achieves 100% test accuracy
+and 99.96% cross-validation accuracy with only
+0.3KB memory overhead, confirming the feasibility of self-configuring deployment
+in which sensor nodes autonomously learn optimal threshold
+values  and  from observed network behaviour -
+eliminating the need for manual parameter tuning during
+installation of large-scale smart city sensor deployments.
+
+Three directions for future work are identified.
+First, integrating energy harvesting rate forecasting
+into the context vector to address the network lifetime
+trade-off demonstrated against EH-Routing .
+Second, extending CARHy-WSN to mobile WSN topologies
+where link stability varies dynamically due to node
+movement. Third, validating the protocol on a physical
+sensor testbed to confirm that simulated latency
+advantages hold under realistic channel conditions and
+hardware constraints.
+
+
+elsarticle-num
+
