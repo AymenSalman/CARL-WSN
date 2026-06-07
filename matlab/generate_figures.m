@@ -7,11 +7,17 @@ if ~exist(figures_dir, 'dir')
     mkdir(figures_dir);
 end
 
-colors = {[0.12 0.47 0.71], [0.20 0.63 0.17], [0.89 0.10 0.11], ...
-          [1.00 0.50 0.05], [0.42 0.24 0.60], [0.65 0.34 0.16]};
+colors = {[0.2 0.4 0.8], [0.0 0.7 0.7], [0.27 0.67 0.19], [0.85 0.1 0.1], ...
+          [1.0 0.6 0.0], [0.5 0.0 0.8], [0.65 0.45 0.2]};
 
 n_proto = length(protocols);
 x_pos   = 1:n_proto;
+
+% Display-friendly names for x-axis labels
+name_map = containers.Map( ...
+    {'CARHy','CARHy_RL','AODV','DSDV','ZRP','EH_Routing','MSLBA'}, ...
+    {'CARHy-WSN','CARL-WSN','AODV','DSDV','ZRP','EH-Routing','MSLBA'});
+labels = cellfun(@(p) name_map(p), protocols, 'UniformOutput', false);
 
 %% ── Figure 1: Network Lifetime (FND) across scenarios ────────────────────
 fig1 = figure('Visible','off','Position',[100 100 700 420]);
@@ -25,7 +31,7 @@ for i = 1:n_proto
 end
 hold on;
 errorbar(x_pos, FND_vals, FND_err, 'k.', 'LineWidth', 1.2);
-set(gca, 'XTick', x_pos, 'XTickLabel', protocols, 'FontSize', 11);
+set(gca, 'XTick', x_pos, 'XTickLabel', labels, 'FontSize', 11);
 ylabel('First Node Death Round', 'FontSize', 12);
 title('Network Lifetime — Mixed Traffic Scenario', 'FontSize', 13);
 grid on; box off;
@@ -46,7 +52,7 @@ end
 hold on;
 errorbar(x_pos, LatA_vals, LatA_err, 'k.', 'LineWidth', 1.2);
 yline(100, '--r', 'Latency threshold (100ms)', 'FontSize', 10);
-set(gca, 'XTick', x_pos, 'XTickLabel', protocols, 'FontSize', 11);
+set(gca, 'XTick', x_pos, 'XTickLabel', labels, 'FontSize', 11);
 ylabel('Mean Latency (ms)', 'FontSize', 12);
 title('Class A Emergency Packet Latency', 'FontSize', 13);
 grid on; box off;
@@ -84,7 +90,7 @@ for i = 1:n_proto
 end
 hold on;
 errorbar(x_pos, Gini_vals, Gini_err, 'k.', 'LineWidth', 1.2);
-set(gca, 'XTick', x_pos, 'XTickLabel', protocols, 'FontSize', 11);
+set(gca, 'XTick', x_pos, 'XTickLabel', labels, 'FontSize', 11);
 ylabel('Gini Coefficient (lower = more balanced)', 'FontSize', 12);
 title('Energy Balance across Protocols', 'FontSize', 13);
 grid on; box off;
@@ -104,7 +110,7 @@ for i = 1:n_proto
 end
 hold on;
 errorbar(x_pos, OH_vals, OH_err, 'k.', 'LineWidth', 1.2);
-set(gca, 'XTick', x_pos, 'XTickLabel', protocols, 'FontSize', 11);
+set(gca, 'XTick', x_pos, 'XTickLabel', labels, 'FontSize', 11);
 ylabel('Control Packets per Data Packet', 'FontSize', 12);
 title('Routing Overhead Comparison', 'FontSize', 13);
 grid on; box off;
@@ -124,7 +130,7 @@ for i = 1:n_proto
 end
 hold on;
 errorbar(x_pos, TP_vals, TP_err, 'k.', 'LineWidth', 1.2);
-set(gca, 'XTick', x_pos, 'XTickLabel', protocols, 'FontSize', 11);
+set(gca, 'XTick', x_pos, 'XTickLabel', labels, 'FontSize', 11);
 ylabel('Packets Delivered per Round', 'FontSize', 12);
 title('Network Throughput — Mixed Traffic', 'FontSize', 13);
 grid on; box off;
