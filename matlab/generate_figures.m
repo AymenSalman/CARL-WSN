@@ -7,16 +7,17 @@ if ~exist(figures_dir, 'dir')
     mkdir(figures_dir);
 end
 
-colors = {[0.2 0.4 0.8], [0.0 0.7 0.7], [0.27 0.67 0.19], [0.85 0.1 0.1], ...
-          [1.0 0.6 0.0], [0.5 0.0 0.8], [0.65 0.45 0.2]};
+colors = {[0.0 0.7 0.7], [0.27 0.67 0.19], [0.85 0.1 0.1], ...
+          [1.0 0.6 0.0], [0.5 0.0 0.8], [0.65 0.45 0.2], ...
+          [0.8 0.2 0.4], [0.4 0.6 0.2]};
 
 n_proto = length(protocols);
 x_pos   = 1:n_proto;
 
 % Display-friendly names for x-axis labels
 name_map = containers.Map( ...
-    {'CARHy','CARHy_RL','AODV','DSDV','ZRP','EH_Routing','MSLBA'}, ...
-    {'CARHy-WSN','CARL-WSN','AODV','DSDV','ZRP','EH-Routing','MSLBA'});
+    {'CARHy_RL','AODV','DSDV','ZRP','EH_Routing','MSLBA','RLCR','FQ_UCR'}, ...
+    {'CARL-WSN','AODV','DSDV','ZRP','EH-Routing','MSLBA','RLCR','FQ-UCR'});
 labels = cellfun(@(p) name_map(p), protocols, 'UniformOutput', false);
 
 %% ── Figure 1: Network Lifetime (FND) across scenarios ────────────────────

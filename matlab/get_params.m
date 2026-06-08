@@ -32,6 +32,13 @@ params.W   = 10;     % ACK window size for link stability EWMA
 %% ── Routing ───────────────────────────────────────────────────────────────
 params.zone_radius = 2;   % ZRP zone radius (hops) — base value for hybrid mode
 
+%% ── Base station position ─────────────────────────────────────────────────
+params.BS_x = 100;    % BS x-coordinate (centre of area)
+params.BS_y = 100;    % BS y-coordinate (centre of area)
+params.A    = 200;    % alias for area (used by baselines)
+params.eps_fs = params.epsilon_fs;   % alias for baseline compatibility
+params.eps_mp = params.epsilon_mp;   % alias for baseline compatibility
+
 %% ── Simulation ────────────────────────────────────────────────────────────
 params.rounds     = 2000;   % total simulation rounds
 params.seed       = 42;     % random seed for reproducibility

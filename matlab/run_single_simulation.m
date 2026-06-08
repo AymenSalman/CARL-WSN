@@ -59,16 +59,14 @@ for r = 1:R
                 ctrl_pkts = ctrl_pkts + estimate_ctrl_overhead('ZRP', pkt_class, net, node_id, params);
 
             case 'EH_Routing'
-                % Energy-harvesting aware routing (your IJEECS 2021 baseline)
                 [net, ~] = routing_eh(node_id, pkt_class, net, params);
                 ctrl_pkts = ctrl_pkts + estimate_ctrl_overhead('EH_Routing', pkt_class, net, node_id, params);
 
             case 'MSLBA'
-                % Multi-sink load balancing (your IJSER 2023 baseline)
                 [net, ~] = routing_mslba(node_id, pkt_class, net, params);
                 ctrl_pkts = ctrl_pkts + estimate_ctrl_overhead('MSLBA', pkt_class, net, node_id, params);
-       
-       case 'CARHy_RL'
+
+            case 'CARHy_RL'
                 % CARL-WSN: RL-based context-aware routing
                 E_r_before = net.energy(node_id) / net.E0(node_id);
                 
@@ -87,20 +85,20 @@ for r = 1:R
                 end
                 
                 % Step C: Count overhead
-                ctrl = estimate_ctrl_overhead('CARHy', pkt_class, net, node_id, params);
+                ctrl = estimate_ctrl_overhead('CARHy_RL', pkt_class, net, node_id, params);
                 ctrl_pkts = ctrl_pkts + ctrl;
                 
                 % Step D: Compute reward
                 E_r_after = net.energy(node_id) / net.E0(node_id);
                 n_nb = 0;
-for nb = 1:length(net.alive)
-    if net.alive(nb) && nb ~= node_id
-        d = sqrt((net.x(nb)-net.x(node_id))^2 + (net.y(nb)-net.y(node_id))^2);
-        if d <= 100
-            n_nb = n_nb + 1;
-        end
-    end
-end
+                for nb = 1:length(net.alive)
+                    if net.alive(nb) && nb ~= node_id
+                        d = sqrt((net.x(nb)-net.x(node_id))^2 + (net.y(nb)-net.y(node_id))^2);
+                        if d <= 100
+                            n_nb = n_nb + 1;
+                        end
+                    end
+                end
                 R_reward = compute_reward(pkt_class, lat, ctrl, n_nb, ...
                            E_r_before, E_r_after);
                 
@@ -115,7 +113,7 @@ end
                          discretise_energy(E_r_new), ...
                          discretise_link(L_s_new));
                 
-               % Step F: Q-Learning update (with NaN guard)
+                % Step F: Q-Learning update (with NaN guard)
                 if ~isnan(R_reward) && ~isnan(max(Q(s_next, :)))
                     old_Q = Q(s, action_idx);
                     Q(s, action_idx) = old_Q + alpha_lr * ...
@@ -127,12 +125,22 @@ end
                         max_delta_this_round = delta;
                     end
                 end
-        end
-    end
+
+            case 'RLCR'
+                [net, ~] = routing_rlcr(node_id, pkt_class, net, params);
+                ctrl_pkts = ctrl_pkts + estimate_ctrl_overhead('RLCR', pkt_class, net, node_id, params);
+
+            case 'FQ_UCR'
+                [net, ~] = routing_fqucr(node_id, pkt_class, net, params);
+                ctrl_pkts = ctrl_pkts + estimate_ctrl_overhead('FQ_UCR', pkt_class, net, node_id, params);
+
+        end  % end switch protocol_name
+    end  % end for each alive node
 
     % Record per-round metrics
     net.metrics.alive_per_round(r)  = sum(net.alive);
     net.metrics.energy_per_round(r) = sum(net.energy(net.alive));
+
     % RL: decay epsilon and record convergence
     if strcmp(protocol_name, 'CARHy_RL')
         epsilon = max(epsilon * epsilon_decay, epsilon_min);
@@ -140,14 +148,14 @@ end
         max_delta_this_round = 0;
     end
 
-end
+end  % end for each round
 
 %% ── Compute final metrics ─────────────────────────────────────────────────
 
 % FND: first node death round
 metrics.FND = net.FND;
 if metrics.FND == 0
-    metrics.FND = R;   % no node died = full lifetime
+    metrics.FND = R;
 end
 
 % HND: half node death round
@@ -173,7 +181,6 @@ end
 % Average energy consumed per round (across alive rounds)
 alive_rounds = find(net.metrics.energy_per_round > 0);
 if ~isempty(alive_rounds)
-    % Energy consumed = initial total - remaining total
     E_initial = sum(net.E0);
     E_remaining = sum(net.energy);
     metrics.AvgEnergy = (E_initial - E_remaining) / length(alive_rounds);
@@ -183,9 +190,6 @@ end
 
 % Gini coefficient (energy balance — lower is better)
 metrics.Gini = compute_gini(net.E0 - net.energy);
-
-% Alive nodes per round (for lifetime figure)
-metrics.alive_per_round = net.metrics.alive_per_round;
 
 % Routing overhead (control packets per data packet)
 if data_pkts > 0
@@ -197,17 +201,14 @@ end
 % Throughput (delivered packets per round)
 metrics.Throughput = net.metrics.delivered / R;
 
-% Throughput (delivered packets per round)
-metrics.Throughput = net.metrics.delivered / R;
-
 % Alive nodes per round (for lifetime figure)
 metrics.alive_per_round = net.metrics.alive_per_round;
 
 % RL-specific outputs
 if strcmp(protocol_name, 'CARHy_RL')
-    metrics.Q_table = Q;              % final learned Q-table
-    metrics.Q_history = Q_history;    % convergence trace
-    metrics.final_epsilon = epsilon;  % final exploration rate
+    metrics.Q_table = Q;
+    metrics.Q_history = Q_history;
+    metrics.final_epsilon = epsilon;
 end
 
 end

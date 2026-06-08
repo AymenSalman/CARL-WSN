@@ -15,7 +15,7 @@ fprintf('========================================\n\n');
 %% ── Configuration ─────────────────────────────────────────────────────────
 params = get_params();
 
-protocols = {'CARHy', 'CARHy_RL', 'AODV', 'DSDV', 'ZRP', 'EH_Routing', 'MSLBA'};
+protocols = {'CARHy_RL', 'AODV', 'DSDV', 'ZRP', 'EH_Routing', 'MSLBA', 'RLCR', 'FQ_UCR'};
 scenarios = {'ClassA', 'ClassB', 'ClassC', 'Mixed'};
 seeds     = [42, 43, 44, 45, 46];   % 5 independent runs
 

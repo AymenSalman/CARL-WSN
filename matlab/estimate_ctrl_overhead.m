@@ -17,6 +17,19 @@ switch protocol
         else
             ctrl = n * 0.06;   % hybrid for events
         end
+    case 'CARHy_RL'
+        if strcmp(pkt_class, 'A')
+            ctrl = n * 0.08;   % proactive for emergency (same as CARHy)
+        elseif strcmp(pkt_class, 'B')
+            ctrl = n * 0.05;   % reactive for telemetry
+        else
+            ctrl = n * 0.06;   % hybrid for events
+        end
+    case 'RLCR'
+        ctrl = n * 0.12;       % CH advertisement + join + inter-cluster RL routing
+    case 'FQ_UCR'
+        ctrl = n * 0.14;       % fuzzy CH selection + unequal clustering + RL routing
+    
     otherwise
         ctrl = n * 0.10;
 end
