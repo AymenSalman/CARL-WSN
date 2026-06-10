@@ -74,15 +74,18 @@ for r = 1:R
                 [mode_selected, action_idx, s] = context_classifier_rl(...
                     node_id, pkt_class, net, params, Q, epsilon);
                 
-                % Step B: Route using the selected mode
-                switch mode_selected
-                    case 'proactive'
-                        [net, lat] = routing_proactive(node_id, pkt_class, net, params);
-                    case 'reactive'
-                        [net, lat] = routing_reactive(node_id, pkt_class, net, params);
-                    case 'hybrid'
-                        [net, lat] = routing_hybrid(node_id, pkt_class, net, params);
+               % Step B: Route using the selected mode
+                if strcmp(mode_selected, 'defer')
+                    % Node defers this packet to save energy
+                    % Minimal energy cost (listening only)
+                    net.energy(node_id) = net.energy(node_id) - params.L * params.E_elec * 0.1;
+                    lat = 0;
+                    ctrl = 0;
+                    % Skip Q-update for deferred packets
+                    continue;
                 end
+                
+                [net, lat] = run_carl_rl(node_id, pkt_class, net, params, mode_selected);
                 
                 % Step C: Count overhead
                 ctrl = estimate_ctrl_overhead('CARHy_RL', pkt_class, net, node_id, params);

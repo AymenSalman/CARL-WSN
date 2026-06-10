@@ -38,6 +38,16 @@ if strcmp(U, 'A')
     return;
 end
 
+%% ── Step 3b: Critical energy deferral for non-urgent traffic ──────────
+% When node is nearly dead (E_r < 0.15), defer Class B/C packets
+% This is a context-aware energy preservation mechanism that only
+% CARL-WSN can perform because it differentiates traffic classes
+if E_r < 0.15 && (strcmp(U, 'B') || strcmp(U, 'C'))
+    mode = 'defer';
+    action_idx = 0;
+    return;
+end
+
 %% ── Step 4: Epsilon-greedy action selection ───────────────────────────
 if rand() < epsilon
     % Explore: pick random action
