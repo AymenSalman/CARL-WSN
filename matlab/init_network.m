@@ -35,7 +35,9 @@ net.energy = net.E0;          % current energy starts at initial energy
 %% ── Node state ────────────────────────────────────────────────────────────
 net.alive       = true(1, N);        % all nodes alive at start
 net.L_s         = ones(1, N);        % link stability = 1.0 (perfect) at start
-net.ack_history = ones(10, N);       % last 10 ACK outcomes per node (1=success)
+net.ack_history = ones(params.W, N);   % was ones(10,N) — now W=30
+net.LND         = 0;                   % last node death (run-to-death horizon)
+net.route_age   = zeros(1, N);         % AODV/ZRP route cache age
 
 %% ── Base station and sink positions ──────────────────────────────────────
 % Base station at centre of area

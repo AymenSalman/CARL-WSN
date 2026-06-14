@@ -792,3 +792,173 @@ pages     = {1--24},
   doi       = {10.3390/e27020118},
   url       = {https://www.mdpi.com/1099-4300/27/2/118},
 }
+
+% ════════════════════════════════════════════════════════════════
+%  GROUP A — Model-origin citations (foundational; pair each with
+%            a recent companion from Group B for currency)
+% ════════════════════════════════════════════════════════════════
+
+% Channel / PRR model
+@inproceedings{zuniga2004,
+  author    = {Zuniga, Marco and Krishnamachari, Bhaskar},
+  title     = {Analyzing the Transitional Region in Low Power Wireless Links},
+  booktitle = { 2004 First Annual IEEE Communications Society Conference on Sensor and Ad Hoc Communications and Networks (SECON)},
+  pages     = {517--526},
+  year      = {2004},
+  doi       = {10.1109/SAHCN.2004.1381954}
+}
+
+% PHY rate, ARQ retries, PRR formula  (IEEE STANDARD, not RFC)
+@misc{ieee802154,
+  author       = {{IEEE}},
+  title        = {{IEEE} Standard for Low-Rate Wireless Networks},
+  howpublished = {IEEE Std 802.15.4-2020},
+  year         = {2020},
+  doi          = {10.1109/IEEESTD.2020.9144691}
+}
+
+% Log-distance path loss + shadowing (optional, only if you keep SNR text)
+@book{rappaport2002,
+  author    = {Rappaport, Theodore S.},
+  title     = {Wireless Communications: Principles and Practice},
+  edition   = {2nd},
+  publisher = {Prentice Hall},
+  year      = {2002}
+}
+
+% Link-quality estimation (L_s / EWMA = WMEWMA)
+@techreport{woo2003,
+  author      = {Woo, Alec and Culler, David},
+  title       = {Evaluation of Efficient Link Reliability Estimators for
+                 Low-Power Wireless Networks},
+  institution = {EECS Dept., Univ. of California, Berkeley},
+  number      = {UCB/CSD-03-1270},
+  year        = {2003}
+}
+
+% Energy-aware geographic relay (weighted progress + residual energy)
+@techreport{gear2001,
+  author      = {Yu, Yan and Govindan, Ramesh and Estrin, Deborah},
+  title       = {Geographical and Energy Aware Routing: A Recursive Data
+                 Dissemination Protocol for Wireless Sensor Networks},
+  institution = {Computer Science Dept., UCLA},
+  number      = {UCLA/CSD-TR-01-0023},
+  year        = {2001}
+}
+
+% Gini coefficient formula
+@article{dorfman1979,
+  author  = {Dorfman, Robert},
+  title   = {A Formula for the Gini Coefficient},
+  journal = {The Review of Economics and Statistics},
+  volume  = {61},
+  number  = {1},
+  pages   = {146--149},
+  year    = {1979},
+  doi     = {10.2307/1924845}
+}
+
+% Q-learning
+@article{watkins1992,
+  author  = {Watkins, Christopher J. C. H. and Dayan, Peter},
+  title   = {Q-learning},
+  journal = {Machine Learning},
+  volume  = {8},
+  number  = {3--4},
+  pages   = {279--292},
+  year    = {1992},
+  doi     = {10.1007/BF00992698}
+}
+
+% epsilon-greedy / RL foundations
+@book{sutton2018,
+  author    = {Sutton, Richard S. and Barto, Andrew G.},
+  title     = {Reinforcement Learning: An Introduction},
+  edition   = {2nd},
+  publisher = {MIT Press},
+  address   = {Cambridge, MA, USA},
+  year      = {2018}
+}
+
+% ════════════════════════════════════════════════════════════════
+%  GROUP B — Recent companions (2023–2026) for currency / related work
+% ════════════════════════════════════════════════════════════════
+
+% Gini-in-WSN, recent use  [TODO: fill authors from the DOI]
+@article{dgipso2025,
+  author  = {Wan, Hang and Gao, Jiaqi and David, Michael and Derigent, William
+             and Zhao, Haiyan and Chang, Yufang},
+  title   = {An Energy-Aware Clustering Approach Based on Gini Coefficient
+             and IPSO Applied for Energy-Constrained Applications},
+  journal = {Telecommunication Systems},
+  volume  = {88},
+  number  = {2},
+  pages   = {51},
+  year    = {2025},
+  doi     = {10.1007/s11235-025-01285-z}
+}
+
+% Recent link-quality-aware RL routing
+@article{drlmror2026,
+  author  = {Zubair, Suleiman},
+  title   = {Transforming Opportunistic Routing: A Deep Reinforcement
+             Learning Framework for Reliable and Energy-Efficient
+             Communication in Mobile Cognitive Radio Sensor Networks},
+  journal = {IoT},
+  volume  = {7},
+  number  = {2},
+  pages   = {34},
+  year    = {2026},
+  doi     = {10.3390/iot7020034}
+}
+
+% Recent RL energy-aware routing (SDWSN)
+@article{rlear2025,
+  author  = {Narwaria, Anjali and Kumari, Vandana and Mazumdar, Arka P.},
+  title   = {RL-EAR: Reinforcement Learning-Based Energy-Aware Routing for
+             Software-Defined Wireless Sensor Network},
+  journal = {The Journal of Supercomputing},
+  volume  = {81},
+  pages   = {485},
+  year    = {2025},
+  doi     = {10.1007/s11227-025-06998-1}
+}
+
+% Recent RL multi-objective routing (SDWSN-IoT)
+@article{godfrey2023,
+  author  = {Godfrey, Daniel and Suh, BeomKyu and Lim, Byung Hyun and
+             Lee, Kyu-Chul and Kim, Ki-Il},
+  title   = {An Energy-Efficient Routing Protocol with Reinforcement
+             Learning in Software-Defined Wireless Sensor Networks},
+  journal = {Sensors},
+  volume  = {23},
+  number  = {20},
+  pages   = {8435},
+  year    = {2023},
+  doi     = {10.3390/s23208435}
+}
+
+@article{lqeer2024,
+  author  = {Shahid, Misbah and Tariq, Moeenuddin and Iqbal, Zeshan and
+             Albarakati, Hussain Mobarak and Fatima, Noor and
+             Khan, Muhammad Attique},
+  title   = {Link-Quality-Based Energy-Efficient Routing Protocol for {WSN}
+             in {IoT}},
+  journal = {IEEE Transactions on Consumer Electronics},
+  volume  = {70},
+  number  = {1},
+  pages   = {4645--4653},
+  year    = {2024},
+  doi     = {10.1109/TCE.2024.3356195}
+}
+
+@article{tbrl2026,
+  author  = {Chaudhari, Archana and Abdullah, Masuk and Deshpande, Vivek and
+             Midhunchakkaravarthy, Divya},
+  title   = {Energy-Efficient Threshold-Based Reinforcement Learning for
+             {WSN} Routing},
+  journal = {Pollack Periodica},
+  year    = {2026},
+  doi     = {10.1556/606.2025.01336},
+  note    = {Online first}
+}

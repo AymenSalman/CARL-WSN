@@ -16,6 +16,15 @@ params.epsilon_mp = 0.0013e-12; % multipath amp energy (J/bit/m^4)
 params.d0         = sqrt(params.epsilon_fs / params.epsilon_mp); % crossover distance
 params.L          = 4000;       % packet size (bits)
 
+%% ── EWMA link stability (adopt cited WMEWMA values) ─────────────────────
+params.W       = 30;     % ACK window  (Woo & Culler)
+params.ewma_a  = 0.5;    % smoothing   (Woo & Culler)
+
+
+%% ── Overhead / discovery ────────────────────────────────────────────────
+params.T_update = 1;     % proactive table-broadcast interval (rounds)
+params.T_route  = 5;     % AODV route-cache lifetime (rounds); grounded in AODV RFC, swept
+
 %% ── Traffic classes ───────────────────────────────────────────────────────
 % Class A: emergency — low latency critical
 % Class B: periodic telemetry — energy efficient
@@ -27,7 +36,18 @@ params.lambda_C = 0.1;    % Class C arrival rate (packets/second)
 %% ── Context classifier thresholds ────────────────────────────────────────
 params.T_E = 0.3;    % energy threshold: below this -> energy critical
 params.T_L = 0.7;    % link stability threshold: below this -> unstable
-params.W   = 10;     % ACK window size for link stability EWMA
+
+
+%% ── Channel / link model (realistic PRR + ARQ) ─────────────────────────
+params.comm_range  = 100;     % communication range (m)
+params.ch_beta     = 90;      % PRR midpoint distance (m)  [Zuniga-Krishnamachari form]
+params.ch_alpha    = 0.18;    % PRR transition sharpness
+params.max_retx    = 3;       % ARQ attempts per hop       [IEEE 802.15.4 default]
+params.max_hops    = 15;      % multi-hop loop guard
+params.datarate    = 250e3;   % PHY data rate (bits/s)     [IEEE 802.15.4 O-QPSK]
+params.t_proc_ms   = 1.0;     % per-hop processing delay (ms)
+params.t_timeout_ms= 8.0;     % retransmission timeout (ms)
+
 
 %% ── Routing ───────────────────────────────────────────────────────────────
 params.zone_radius = 2;   % ZRP zone radius (hops) — base value for hybrid mode

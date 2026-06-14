@@ -30,7 +30,22 @@ for r = 1:R
         break;
     end
 
-    alive_idx = find(net.alive);
+   alive_idx = find(net.alive);
+
+    % ── Per-round routing overhead (proactive families) + route-cache aging ──
+    net.route_age = max(net.route_age - 1, 0);
+    switch protocol_name
+        case {'DSDV','EH_Routing','MSLBA'}
+            ctrl_pkts = ctrl_pkts + sum(net.alive)/params.T_update;
+        case 'ZRP'
+            for ii = alive_idx(:)'
+                E_r = net.energy(ii)/net.E0(ii);
+                if E_r>=0.7, zr=120; elseif E_r>=0.3, zr=80; else, zr=40; end
+                if hypot(net.x(ii)-net.BS(1),net.y(ii)-net.BS(2)) <= zr
+                    ctrl_pkts = ctrl_pkts + 1/params.T_update;
+                end
+            end
+    end
 
     % Each alive node generates and sends one packet per round
     for i = 1:length(alive_idx)
@@ -42,29 +57,9 @@ for r = 1:R
 
         % Route packet using the specified protocol
         switch protocol_name
-            case 'CARHy'
-                [net, ~] = run_carhy(node_id, pkt_class, net, params);
-                ctrl_pkts = ctrl_pkts + estimate_ctrl_overhead('CARHy', pkt_class, net, node_id, params);
-
-            case 'AODV'
-                [net, ~] = routing_reactive(node_id, pkt_class, net, params);
-                ctrl_pkts = ctrl_pkts + estimate_ctrl_overhead('AODV', pkt_class, net, node_id, params);
-
-            case 'DSDV'
-                [net, ~] = routing_proactive(node_id, pkt_class, net, params);
-                ctrl_pkts = ctrl_pkts + estimate_ctrl_overhead('DSDV', pkt_class, net, node_id, params);
-
-            case 'ZRP'
-                [net, ~] = routing_hybrid(node_id, pkt_class, net, params);
-                ctrl_pkts = ctrl_pkts + estimate_ctrl_overhead('ZRP', pkt_class, net, node_id, params);
-
-            case 'EH_Routing'
-                [net, ~] = routing_eh(node_id, pkt_class, net, params);
-                ctrl_pkts = ctrl_pkts + estimate_ctrl_overhead('EH_Routing', pkt_class, net, node_id, params);
-
-            case 'MSLBA'
-                [net, ~] = routing_mslba(node_id, pkt_class, net, params);
-                ctrl_pkts = ctrl_pkts + estimate_ctrl_overhead('MSLBA', pkt_class, net, node_id, params);
+           case {'AODV','DSDV','ZRP','EH_Routing','MSLBA'}
+                [net, c_od] = route_baseline(node_id, pkt_class, net, params, protocol_name);
+                ctrl_pkts = ctrl_pkts + c_od;
 
             case 'CARHy_RL'
                 % CARL-WSN: RL-based context-aware routing
