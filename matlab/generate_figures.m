@@ -1,149 +1,87 @@
-function generate_figures(results_mean, results_std, protocols, scenarios)
-% GENERATE_FIGURES  Creates all paper figures as vector PDF files
-%   Saves to ..\figures\ folder
+%% GENERATE_FIGURES.M  Publication figures from the real campaign data
+clc; clear; close all;
+load('..\results\campaign_results.mat');   % must run from the matlab\ folder
 
-figures_dir = '..\figures\';
-if ~exist(figures_dir, 'dir')
-    mkdir(figures_dir);
+disp_names = {'CARL-WSN','AODV','DSDV','ZRP','EH-Routing','MSLBA','RLCR','FQ-UCR'};
+np = numel(protocols);
+sMix = find(strcmp(scenarios,'Mixed'));
+cols = [0.20 0.45 0.80; 0.30 0.69 0.29; 0.84 0.19 0.15; 1.00 0.60 0.00; ...
+        0.49 0.18 0.56; 0.55 0.34 0.29; 0.30 0.75 0.75; 0.90 0.42 0.65];
+figdir = '..\figures\';
+mu  = @(s,met) squeeze(results_mean(:,s,1,met));
+sd  = @(s,met) squeeze(results_std (:,s,1,met));
+setfig = @() set(gcf,'Color','w','Position',[100 100 760 480]);
+stylex = @() set(gca,'XTick',1:np,'XTickLabel',disp_names,'XTickLabelRotation',35,...
+                 'FontSize',12,'FontWeight','bold','Box','off');
+
+% Fig 1: lifetime FND + HND
+figure; setfig();
+F=mu(sMix,M.FND); H=mu(sMix,M.HND); Fe=sd(sMix,M.FND); He=sd(sMix,M.HND);
+b=bar([F H],'grouped'); b(1).FaceColor=[0.20 0.45 0.80]; b(2).FaceColor=[0.84 0.19 0.15];
+hold on; errorbar(b(1).XEndPoints,F,Fe,'k','linestyle','none','LineWidth',1);
+errorbar(b(2).XEndPoints,H,He,'k','linestyle','none','LineWidth',1);
+ylabel('Round'); legend({'FND','HND'},'Location','northwest');
+title('Network Lifetime — Mixed Traffic'); stylex();
+exportgraphics(gcf,[figdir 'fig1_lifetime_FND.pdf'],'ContentType','vector');
+
+% Fig 2: Class A latency
+figure; setfig();
+L=mu(sMix,M.LatA); Le=sd(sMix,M.LatA);
+b=bar(L,'FaceColor','flat'); for i=1:np, b.CData(i,:)=cols(i,:); end
+hold on; errorbar(1:np,L,Le,'k','linestyle','none','LineWidth',1);
+yline(100,'--r','Latency threshold (100 ms)','LineWidth',1.5,'FontSize',11);
+ylabel('Mean Class A Latency (ms)'); ylim([0 max(40,max(L)+5)]);
+title('Class A Emergency Packet Latency'); stylex();
+exportgraphics(gcf,[figdir 'fig2_latency_classA.pdf'],'ContentType','vector');
+
+% Fig 3: PDR across scenarios
+figure; setfig();
+PDR=squeeze(results_mean(:,:,1,M.PDR))*100;
+bar(PDR,'grouped'); ylabel('Packet Delivery Ratio (%)'); ylim([0 110]);
+legend(scenarios,'Location','southoutside','Orientation','horizontal');
+title('PDR across Traffic Scenarios'); stylex();
+exportgraphics(gcf,[figdir 'fig3_PDR_scenarios.pdf'],'ContentType','vector');
+
+% Fig 4: Gini
+figure; setfig();
+G=mu(sMix,M.Gini); Ge=sd(sMix,M.Gini);
+b=bar(G,'FaceColor','flat'); for i=1:np, b.CData(i,:)=cols(i,:); end
+hold on; errorbar(1:np,G,Ge,'k','linestyle','none','LineWidth',1);
+ylabel('Gini Coefficient (lower = more balanced)'); ylim([0 0.25]);
+title('Energy Balance across Protocols'); stylex();
+exportgraphics(gcf,[figdir 'fig4_energy_gini.pdf'],'ContentType','vector');
+
+% Fig 5: overhead, log scale, clustering at TDMA
+figure; setfig();
+OH=mu(sMix,M.OH);
+OH(strcmp(protocols,'RLCR'))   = results_mean(find(strcmp(protocols,'RLCR')),sMix,1,M.OHt);
+OH(strcmp(protocols,'FQ_UCR')) = results_mean(find(strcmp(protocols,'FQ_UCR')),sMix,1,M.OHt);
+b=bar(OH,'FaceColor','flat'); for i=1:np, b.CData(i,:)=cols(i,:); end
+set(gca,'YScale','log'); ylabel('Control Packets per Data Packet (log)');
+for i=1:np, text(i,OH(i)*1.15,sprintf('%.2f',OH(i)),'HorizontalAlignment','center','FontSize',9); end
+title('Routing Overhead (clustering under TDMA accounting)'); stylex();
+exportgraphics(gcf,[figdir 'fig5_routing_overhead.pdf'],'ContentType','vector');
+
+% Fig 6: throughput
+figure; setfig();
+T=mu(sMix,M.Thru); Te=sd(sMix,M.Thru);
+b=bar(T,'FaceColor','flat'); for i=1:np, b.CData(i,:)=cols(i,:); end
+hold on; errorbar(1:np,T,Te,'k','linestyle','none','LineWidth',1);
+ylabel('Packets Delivered per Round');
+title('Network Throughput — Mixed Traffic'); stylex();
+exportgraphics(gcf,[figdir 'fig6_throughput.pdf'],'ContentType','vector');
+
+% Fig 7: alive-over-time, representative seed
+figure; setfig();
+ks=1; hold on;
+for p=1:np
+    c=alive_curves{p,sMix,ks};
+    plot(1:numel(c),c,'LineWidth',1.8,'Color',cols(p,:));
 end
+xlabel('Round'); ylabel('Alive Nodes'); xlim([0 1500]); ylim([0 100]);
+legend(disp_names,'Location','northeastoutside');
+title('Network Decay — Mixed Traffic (seed 42)');
+set(gca,'FontSize',12,'FontWeight','bold','Box','off');
+exportgraphics(gcf,[figdir 'fig7_alive_curve.pdf'],'ContentType','vector');
 
-colors = {[0.0 0.7 0.7], [0.27 0.67 0.19], [0.85 0.1 0.1], ...
-          [1.0 0.6 0.0], [0.5 0.0 0.8], [0.65 0.45 0.2], ...
-          [0.8 0.2 0.4], [0.4 0.6 0.2]};
-
-n_proto = length(protocols);
-x_pos   = 1:n_proto;
-
-% Display-friendly names for x-axis labels
-name_map = containers.Map( ...
-    {'CARHy_RL','AODV','DSDV','ZRP','EH_Routing','MSLBA','RLCR','FQ_UCR'}, ...
-    {'CARL-WSN','AODV','DSDV','ZRP','EH-Routing','MSLBA','RLCR','FQ-UCR'});
-labels = cellfun(@(p) name_map(p), protocols, 'UniformOutput', false);
-
-%% ── Figure 1: Network Lifetime (FND) across scenarios ────────────────────
-fig1 = figure('Visible','off','Position',[100 100 700 420]);
-scen_idx = 4;   % Mixed traffic scenario
-FND_vals = squeeze(results_mean(:, scen_idx, 1));
-FND_err  = squeeze(results_std(:,  scen_idx, 1));
-
-b = bar(x_pos, FND_vals, 0.6, 'FaceColor','flat');
-for i = 1:n_proto
-    b.CData(i,:) = colors{i};
-end
-hold on;
-errorbar(x_pos, FND_vals, FND_err, 'k.', 'LineWidth', 1.2);
-set(gca, 'XTick', x_pos, 'XTickLabel', labels, 'FontSize', 11);
-ylabel('First Node Death Round', 'FontSize', 12);
-title('Network Lifetime — Mixed Traffic Scenario', 'FontSize', 13);
-grid on; box off;
-exportgraphics(fig1, fullfile(figures_dir,'fig1_lifetime_FND.pdf'), ...
-               'ContentType','vector');
-fprintf('Saved: fig1_lifetime_FND.pdf\n');
-close(fig1);
-
-%% ── Figure 2: Class A Emergency Latency comparison ───────────────────────
-fig2 = figure('Visible','off','Position',[100 100 700 420]);
-LatA_vals = squeeze(results_mean(:, scen_idx, 4));
-LatA_err  = squeeze(results_std(:,  scen_idx, 4));
-
-b2 = bar(x_pos, LatA_vals, 0.6, 'FaceColor','flat');
-for i = 1:n_proto
-    b2.CData(i,:) = colors{i};
-end
-hold on;
-errorbar(x_pos, LatA_vals, LatA_err, 'k.', 'LineWidth', 1.2);
-yline(100, '--r', 'Latency threshold (100ms)', 'FontSize', 10);
-set(gca, 'XTick', x_pos, 'XTickLabel', labels, 'FontSize', 11);
-ylabel('Mean Latency (ms)', 'FontSize', 12);
-title('Class A Emergency Packet Latency', 'FontSize', 13);
-grid on; box off;
-exportgraphics(fig2, fullfile(figures_dir,'fig2_latency_classA.pdf'), ...
-               'ContentType','vector');
-fprintf('Saved: fig2_latency_classA.pdf\n');
-close(fig2);
-
-%% ── Figure 3: PDR under all four traffic scenarios ───────────────────────
-fig3 = figure('Visible','off','Position',[100 100 750 450]);
-PDR_all = squeeze(results_mean(:,:,3)) * 100;   % convert to %
-b3 = bar(PDR_all', 0.8);
-for i = 1:n_proto
-    b3(i).FaceColor = colors{i};
-end
-set(gca, 'XTick', 1:4, 'XTickLabel', scenarios, 'FontSize', 11);
-ylabel('Packet Delivery Ratio (%)', 'FontSize', 12);
-title('PDR across Traffic Scenarios', 'FontSize', 13);
-legend(protocols, 'Location','southeast', 'FontSize', 9);
-ylim([0 110]);
-grid on; box off;
-exportgraphics(fig3, fullfile(figures_dir,'fig3_PDR_scenarios.pdf'), ...
-               'ContentType','vector');
-fprintf('Saved: fig3_PDR_scenarios.pdf\n');
-close(fig3);
-
-%% ── Figure 4: Energy Balance (Gini coefficient) ─────────────────────────
-fig4 = figure('Visible','off','Position',[100 100 700 420]);
-Gini_vals = squeeze(results_mean(:, scen_idx, 6));
-Gini_err  = squeeze(results_std(:,  scen_idx, 6));
-
-b4 = bar(x_pos, Gini_vals, 0.6, 'FaceColor','flat');
-for i = 1:n_proto
-    b4.CData(i,:) = colors{i};
-end
-hold on;
-errorbar(x_pos, Gini_vals, Gini_err, 'k.', 'LineWidth', 1.2);
-set(gca, 'XTick', x_pos, 'XTickLabel', labels, 'FontSize', 11);
-ylabel('Gini Coefficient (lower = more balanced)', 'FontSize', 12);
-title('Energy Balance across Protocols', 'FontSize', 13);
-grid on; box off;
-exportgraphics(fig4, fullfile(figures_dir,'fig4_energy_gini.pdf'), ...
-               'ContentType','vector');
-fprintf('Saved: fig4_energy_gini.pdf\n');
-close(fig4);
-
-%% ── Figure 5: Routing Overhead ───────────────────────────────────────────
-fig5 = figure('Visible','off','Position',[100 100 700 420]);
-OH_vals = squeeze(results_mean(:, scen_idx, 7));
-OH_err  = squeeze(results_std(:,  scen_idx, 7));
-
-b5 = bar(x_pos, OH_vals, 0.6, 'FaceColor','flat');
-for i = 1:n_proto
-    b5.CData(i,:) = colors{i};
-end
-hold on;
-errorbar(x_pos, OH_vals, OH_err, 'k.', 'LineWidth', 1.2);
-set(gca, 'XTick', x_pos, 'XTickLabel', labels, 'FontSize', 11);
-ylabel('Control Packets per Data Packet', 'FontSize', 12);
-title('Routing Overhead Comparison', 'FontSize', 13);
-grid on; box off;
-exportgraphics(fig5, fullfile(figures_dir,'fig5_routing_overhead.pdf'), ...
-               'ContentType','vector');
-fprintf('Saved: fig5_routing_overhead.pdf\n');
-close(fig5);
-
-%% ── Figure 6: Throughput comparison ─────────────────────────────────────
-fig6 = figure('Visible','off','Position',[100 100 700 420]);
-TP_vals = squeeze(results_mean(:, scen_idx, 8));
-TP_err  = squeeze(results_std(:,  scen_idx, 8));
-
-b6 = bar(x_pos, TP_vals, 0.6, 'FaceColor','flat');
-for i = 1:n_proto
-    b6.CData(i,:) = colors{i};
-end
-hold on;
-errorbar(x_pos, TP_vals, TP_err, 'k.', 'LineWidth', 1.2);
-set(gca, 'XTick', x_pos, 'XTickLabel', labels, 'FontSize', 11);
-ylabel('Packets Delivered per Round', 'FontSize', 12);
-title('Network Throughput — Mixed Traffic', 'FontSize', 13);
-grid on; box off;
-exportgraphics(fig6, fullfile(figures_dir,'fig6_throughput.pdf'), ...
-               'ContentType','vector');
-fprintf('Saved: fig6_throughput.pdf\n');
-close(fig6);
-
-%% ── Figure 7: Alive nodes over time (CARHy vs best baseline) ────────────
-% This needs raw per-round data — placeholder for now
-fprintf('Note: fig7 (alive over time) requires per-round raw data.\n');
-fprintf('      Run with params.save_raw=true to enable.\n');
-
-fprintf('\nAll figures saved to %s\n', figures_dir);
-end
+fprintf('All 7 figures written to %s\n', figdir);

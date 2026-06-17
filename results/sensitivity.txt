@@ -1,0 +1,28 @@
+
+=== w_e/w_p (relay weights) ===
+value             PDR%     FND     HND    LatA  Overhead
+0.4/0.6           89.6     418    2132    24.1      0.52
+0.6/0.4 (def)     90.2     418    2198    24.2      0.53
+0.8/0.2           89.9     418    2235    24.3      0.52
+  swing%: PDR 0.6  FND 0.0  HND 4.7  LatA 1.0  OH 0.4
+
+=== PRR midpoint beta ===
+value             PDR%     FND     HND    LatA  Overhead
+80                83.8     345    1818    26.1      0.53
+90 (def)          90.2     418    2198    24.2      0.53
+100               92.8     650    2430    22.2      0.52
+  swing%: PDR 10.1  FND 64.8  HND 28.5  LatA 16.2  OH 2.7
+
+=== PRR sharpness alpha ===
+value             PDR%     FND     HND    LatA  Overhead
+0.12              90.0     451    2108    25.2      0.51
+0.18 (def)        90.2     418    2198    24.2      0.53
+0.25              90.1     387    2249    23.5      0.54
+  swing%: PDR 0.2  FND 15.2  HND 6.5  LatA 6.9  OH 4.3
+
+=== Link-stability T_L ===
+value             PDR%     FND     HND    LatA  Overhead
+0.6               90.2     418    2198    24.2      0.53
+0.7 (def)         90.2     418    2198    24.2      0.53
+0.8               90.2     418    2198    24.2      0.53
+  swing%: PDR 0.0  FND 0.0  HND 0.0  LatA 0.0  OH 0.0

@@ -22,21 +22,29 @@ if strcmp(protocol_name, 'CARHy_RL')
 end
 
 %% ── Per-round simulation loop ─────────────────────────────────────────────
+end_round = R; cap_hit = true;
 for r = 1:R
     net.round = r;
 
     % Skip round if less than 10% nodes alive
-    if sum(net.alive) < floor(N * 0.10)
-        break;
+   if sum(net.alive) < floor(N * 0.10)
+        end_round = max(r-1,1); cap_hit = false; break;
     end
 
    alive_idx = find(net.alive);
 
-    % ── Per-round routing overhead (proactive families) + route-cache aging ──
+   % ── Per-round routing overhead + route-cache aging ──
     net.route_age = max(net.route_age - 1, 0);
+    n_alive = sum(net.alive);
     switch protocol_name
-        case {'DSDV','EH_Routing','MSLBA'}
-            ctrl_pkts = ctrl_pkts + sum(net.alive)/params.T_update;
+        case 'DSDV'
+            % Full-dump: each node broadcasts its entire table (n_alive
+            % entries), fragmented across packets.
+            frags = ceil(n_alive * params.dsdv_entry_bits / params.L);
+            ctrl_pkts = ctrl_pkts + n_alive * frags / params.T_update;
+        case {'EH_Routing','MSLBA'}
+            % Single small state value (energy / nearest-sink id): one packet.
+            ctrl_pkts = ctrl_pkts + n_alive / params.T_update;
         case 'ZRP'
             for ii = alive_idx(:)'
                 E_r = net.energy(ii)/net.E0(ii);
@@ -62,75 +70,71 @@ for r = 1:R
                 ctrl_pkts = ctrl_pkts + c_od;
 
             case 'CARHy_RL'
-                % CARL-WSN: RL-based context-aware routing
-                E_r_before = net.energy(node_id) / net.E0(node_id);
-                
-                % Step A: RL agent selects routing mode
-                [mode_selected, action_idx, s] = context_classifier_rl(...
-                    node_id, pkt_class, net, params, Q, epsilon);
-                
-               % Step B: Route using the selected mode
+                % CARL-WSN: RL paradigm selection on the shared realistic engine
+                [mode_selected, action_idx, s] = ...
+                    context_classifier_rl(node_id, pkt_class, net, params, Q, epsilon);
+
+                % --- critical-node deferral: counts as generated, not delivered ---
                 if strcmp(mode_selected, 'defer')
-                    % Node defers this packet to save energy
-                    % Minimal energy cost (listening only)
-                    net.energy(node_id) = net.energy(node_id) - params.L * params.E_elec * 0.1;
-                    lat = 0;
-                    ctrl = 0;
-                    % Skip Q-update for deferred packets
-                    continue;
+                    net.defer_count(node_id) = net.defer_count(node_id) + 1;
+                    net.energy(node_id) = max(net.energy(node_id) ...
+                        - params.L*params.E_elec*0.1, 0);     % listening cost only
+                    net = check_node_death(net, node_id, params);
+                    net.metrics.total_sent = net.metrics.total_sent + 1;
+                    continue;                                  % no action -> no Q-update
                 end
-                
-                [net, lat] = run_carl_rl(node_id, pkt_class, net, params, mode_selected);
-                
-                % Step C: Count overhead
-                ctrl = estimate_ctrl_overhead('CARHy_RL', pkt_class, net, node_id, params);
-                ctrl_pkts = ctrl_pkts + ctrl;
-                
-                % Step D: Compute reward
-                E_r_after = net.energy(node_id) / net.E0(node_id);
-                n_nb = 0;
-                for nb = 1:length(net.alive)
-                    if net.alive(nb) && nb ~= node_id
-                        d = sqrt((net.x(nb)-net.x(node_id))^2 + (net.y(nb)-net.y(node_id))^2);
-                        if d <= 100
-                            n_nb = n_nb + 1;
+
+                % --- data-plane delivery (energy-aware geographic relay) ---
+                net.defer_count(node_id) = 0;   % reset on actual transmission
+                [net, delivered, lat_data, n_hops, ~, e_used] = ...
+                    forward_to_dest(node_id, net, params, net.BS, 'carl');
+
+                % --- paradigm-dependent latency + Option-C overhead ---
+                lat = lat_data; ctrl = 0;
+                switch mode_selected
+                    case 'proactive'                           % maintained table, no discovery
+                        ctrl = 1;
+                    case 'reactive'                            % on-demand discovery (energy piggybacked), cached
+                        if net.route_age(node_id) <= 0
+                            ctrl = 1; net.route_age(node_id) = params.T_route;
+                            lat = lat + n_hops*(params.L/params.datarate*1000);
                         end
-                    end
+                    case 'hybrid'                              % zone-scoped discovery, cached
+                        if net.route_age(node_id) <= 0
+                            ctrl = 1; net.route_age(node_id) = params.T_route;
+                        end
                 end
-                R_reward = compute_reward(pkt_class, lat, ctrl, n_nb, ...
-                           E_r_before, E_r_after);
-                
-                % Step E: Compute next state
-                E_r_new = net.energy(node_id) / net.E0(node_id);
-                alpha_ewma = 0.3;
-                ack_col = net.ack_history(:, node_id);
-                w_ewma = alpha_ewma * (1 - alpha_ewma).^(0:9)';
-                w_ewma = w_ewma / sum(w_ewma);
-                L_s_new = dot(w_ewma, ack_col);
-                s_next = state_index(class_to_num(pkt_class), ...
-                         discretise_energy(E_r_new), ...
-                         discretise_link(L_s_new));
-                
-                % Step F: Q-Learning update (with NaN guard)
-                if ~isnan(R_reward) && ~isnan(max(Q(s_next, :)))
-                    old_Q = Q(s, action_idx);
-                    Q(s, action_idx) = old_Q + alpha_lr * ...
-                        (R_reward + gamma_df * max(Q(s_next, :)) - old_Q);
-                    
-                    % Track convergence
-                    delta = abs(Q(s, action_idx) - old_Q);
-                    if delta > max_delta_this_round
-                        max_delta_this_round = delta;
+                ctrl_pkts = ctrl_pkts + ctrl;
+
+                % --- metrics ---
+                net.metrics.total_sent = net.metrics.total_sent + 1;
+                if delivered
+                    net.metrics.delivered = net.metrics.delivered + 1;
+                    if strcmp(pkt_class,'A'), net.metrics.latency_A(end+1) = lat; end
+                end
+
+                % --- reward + Q-update (Class A is safety-forced: never learned) ---
+                if ~strcmp(pkt_class,'A')
+                    R_reward = compute_reward(pkt_class, lat, ctrl, e_used, params);
+                    E_r_new  = net.energy(node_id)/net.E0(node_id);
+                    s_next   = state_index(class_to_num(pkt_class), ...
+                               discretise_energy(E_r_new), discretise_link(net.L_s(node_id)));
+                    if ~isnan(R_reward) && ~isnan(max(Q(s_next,:)))
+                        old_Q = Q(s, action_idx);
+                        Q(s, action_idx) = old_Q + alpha_lr * ...
+                            (R_reward + gamma_df*max(Q(s_next,:)) - old_Q);
+                        delta = abs(Q(s, action_idx) - old_Q);
+                        if delta > max_delta_this_round, max_delta_this_round = delta; end
                     end
                 end
 
             case 'RLCR'
                 [net, ~] = routing_rlcr(node_id, pkt_class, net, params);
-                ctrl_pkts = ctrl_pkts + estimate_ctrl_overhead('RLCR', pkt_class, net, node_id, params);
+                
 
             case 'FQ_UCR'
                 [net, ~] = routing_fqucr(node_id, pkt_class, net, params);
-                ctrl_pkts = ctrl_pkts + estimate_ctrl_overhead('FQ_UCR', pkt_class, net, node_id, params);
+               
 
         end  % end switch protocol_name
     end  % end for each alive node
@@ -189,12 +193,24 @@ end
 % Gini coefficient (energy balance — lower is better)
 metrics.Gini = compute_gini(net.E0 - net.energy);
 
-% Routing overhead (control packets per data packet)
+% Routing overhead (dual mode for clustering)
 if data_pkts > 0
-    metrics.Overhead = ctrl_pkts / data_pkts;
+    if any(strcmp(protocol_name, {'RLCR','FQ_UCR'}))
+        metrics.Overhead      = net.cluster_ctrl / data_pkts;                            % re-cluster only
+        metrics.Overhead_tdma = (net.cluster_ctrl + net.cluster_ctrl_tdma) / data_pkts;  % + TDMA
+    else
+        metrics.Overhead      = ctrl_pkts / data_pkts;
+        metrics.Overhead_tdma = metrics.Overhead;
+    end
 else
-    metrics.Overhead = 0;
+    metrics.Overhead = 0; metrics.Overhead_tdma = 0;
 end
+% Horizon components (main.m computes Throughput/AvgEnergy over a common horizon)
+metrics.LND            = net.LND;  if metrics.LND==0, metrics.LND = R; end
+metrics.TotalDelivered = net.metrics.delivered;
+metrics.TotalEnergy    = sum(net.E0) - sum(net.energy);
+metrics.EndRound       = end_round;
+metrics.CapHit         = cap_hit;
 
 % Throughput (delivered packets per round)
 metrics.Throughput = net.metrics.delivered / R;

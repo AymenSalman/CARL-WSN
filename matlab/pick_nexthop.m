@@ -10,10 +10,13 @@ function nxt = pick_nexthop(cur, net, params, dest, mode)
         if dj > params.comm_range, continue; end
         ddest = hypot(net.x(j)-dest(1), net.y(j)-dest(2));
         if ddest >= dcur, continue; end          % must make progress
+        prog = (dcur-ddest)/dcur;
         if strcmp(mode,'energy')
             s = (net.energy(j)/net.E0(j)) * link_prr(dj, params);
+        elseif strcmp(mode,'carl')
+            s = (params.w_p*prog + params.w_e*(net.energy(j)/net.E0(j))) * link_prr(dj, params);
         else
-            s = ((dcur-ddest)/dcur) * link_prr(dj, params);
+            s = prog * link_prr(dj, params);
         end
         if s > best, best = s; nxt = j; end
     end

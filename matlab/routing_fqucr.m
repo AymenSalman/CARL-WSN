@@ -175,134 +175,87 @@ if net.round - net.fqucr_last_cluster_round >= cluster_interval
         end
     end
     
+    n_ch = length(net.fqucr_ch_list);
+    net.cluster_ctrl = net.cluster_ctrl + n_alive + (n_alive - n_ch);
     net.fqucr_last_cluster_round = net.round;
 end
 
-%% ── Phase 2: Intra-cluster + Inter-cluster Routing ───────────────────────
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%% ── Phase 2: routing on the real channel (all hops via transmit_hop) ─────
 my_ch = net.fqucr_membership(node_id);
-if my_ch == 0
-    my_ch = node_id;
-end
+if my_ch == 0 || ~net.alive(my_ch), my_ch = node_id; end
 
-% Member → CH transmission
+delivered = true; latency = 0;
+
+% Step A: Member -> CH (one channel-aware hop)
 if node_id ~= my_ch
-    d_to_ch = sqrt((net.x(node_id)-net.x(my_ch))^2 + (net.y(node_id)-net.y(my_ch))^2);
-    net = deduct_energy_tx_fq(net, node_id, d_to_ch, params);
-    net = deduct_energy_rx_fq(net, my_ch, params);
+    [net, ok, dl] = transmit_hop(net, params, node_id, my_ch);
+    latency = latency + dl;
+    if ~ok, delivered = false; end
 end
 
-% CH → BS: Q-Learning inter-cluster routing
-current = my_ch;
-hops = 0;
-max_hops = 10;
-visited = false(1, params.N);
-
-while current ~= 0 && hops < max_hops
-    visited(current) = true;
-    d_to_bs = sqrt((net.x(current)-params.BS_x)^2 + (net.y(current)-params.BS_y)^2);
-    
-    if d_to_bs <= 150
-        net = deduct_energy_tx_fq(net, current, d_to_bs, params);
-        break;
+% Step B: CH -> BS (inter-cluster Q-routing), each hop channel-aware
+if delivered
+    current = my_ch; hops = 0; max_hops = 10; visited = false(1, params.N);
+    while current ~= 0 && hops < max_hops
+        visited(current) = true;
+        d_to_bs = sqrt((net.x(current)-params.BS_x)^2 + (net.y(current)-params.BS_y)^2);
+        if d_to_bs <= params.comm_range
+            [net, ok, dl] = transmit_hop(net, params, current, 0);
+            latency = latency + dl; if ~ok, delivered = false; end
+            break;
+        end
+        candidate_chs = net.fqucr_ch_list(net.alive(net.fqucr_ch_list) & ~visited(net.fqucr_ch_list));
+        if isempty(candidate_chs)
+            [net, ok, dl] = transmit_hop(net, params, current, 0);
+            latency = latency + dl; if ~ok, delivered = false; end
+            break;
+        end
+        if rand() < net.fqucr_epsilon
+            next_hop = candidate_chs(randi(length(candidate_chs)));
+        else
+            [~, bi] = max(net.fqucr_Q_route(current, candidate_chs));
+            next_hop = candidate_chs(bi);
+        end
+        [net, ok, dl] = transmit_hop(net, params, current, next_hop);
+        latency = latency + dl;
+        if ~ok, delivered = false; break; end
+        d_next_bs = sqrt((net.x(next_hop)-params.BS_x)^2 + (net.y(next_hop)-params.BS_y)^2);
+        progress = (d_to_bs - d_next_bs) / d_to_bs;
+        route_reward = 0.6*progress + 0.4*(net.energy(next_hop)/net.E0(next_hop));
+        if ~isnan(route_reward)
+            old_q = net.fqucr_Q_route(current, next_hop);
+            fmax = max(net.fqucr_Q_route(next_hop, :)); if isnan(fmax), fmax = 0; end
+            net.fqucr_Q_route(current, next_hop) = old_q + net.fqucr_alpha*(route_reward + net.fqucr_gamma*fmax - old_q);
+        end
+        current = next_hop; hops = hops + 1;
     end
-    
-    % Find candidate next-hop CHs
-    candidate_chs = net.fqucr_ch_list(net.alive(net.fqucr_ch_list) & ~visited(net.fqucr_ch_list));
-    
-    if isempty(candidate_chs)
-        net = deduct_energy_tx_fq(net, current, d_to_bs, params);
-        break;
-    end
-    
-    % Epsilon-greedy
-    if rand() < net.fqucr_epsilon
-        next_hop = candidate_chs(randi(length(candidate_chs)));
-    else
-        q_vals = net.fqucr_Q_route(current, candidate_chs);
-        [~, best_idx] = max(q_vals);
-        next_hop = candidate_chs(best_idx);
-    end
-    
-    % Transmit
-    d_hop = sqrt((net.x(current)-net.x(next_hop))^2 + (net.y(current)-net.y(next_hop))^2);
-    net = deduct_energy_tx_fq(net, current, d_hop, params);
-    net = deduct_energy_rx_fq(net, next_hop, params);
-    
-    % Reward
-    d_next_bs = sqrt((net.x(next_hop)-params.BS_x)^2 + (net.y(next_hop)-params.BS_y)^2);
-    progress = (d_to_bs - d_next_bs) / d_to_bs;
-    energy_factor = net.energy(next_hop) / net.E0(next_hop);
-    route_reward = 0.6 * progress + 0.4 * energy_factor;
-    
-    % Q-update
-    if ~isnan(route_reward)
-        old_q = net.fqucr_Q_route(current, next_hop);
-        future_max = max(net.fqucr_Q_route(next_hop, :));
-        if isnan(future_max), future_max = 0; end
-        net.fqucr_Q_route(current, next_hop) = old_q + net.fqucr_alpha * ...
-            (route_reward + net.fqucr_gamma * future_max - old_q);
-    end
-    
-    current = next_hop;
-    hops = hops + 1;
 end
 
-% Fuzzy clustering + Q-Learning routing latency
-latency = 12 + hops * 10 + rand() * 5;
+% TDMA per-round intra-cluster signalling (amortised; only in 'tdma' mode)
+na = sum(net.alive);
+if na > 0 && ~isempty(net.fqucr_ch_list)
+    net.cluster_ctrl_tdma = net.cluster_ctrl_tdma + sum(net.alive(net.fqucr_ch_list))/na;
+end
 
-% Record delivery
+% Metrics
 net.metrics.total_sent = net.metrics.total_sent + 1;
-net.metrics.delivered = net.metrics.delivered + 1;
-if strcmp(packet_class, 'A')
-    net.metrics.latency_A = [net.metrics.latency_A, latency];
+if delivered
+    net.metrics.delivered = net.metrics.delivered + 1;
+    if strcmp(packet_class, 'A'), net.metrics.latency_A(end+1) = latency; end
 end
 
-end
-
-%% ── Helpers ──────────────────────────────────────────────────────────────
-
-
-function net = deduct_energy_tx_fq(net, node_id, d, params)
-    E_elec = params.E_elec;
-    eps_fs = params.eps_fs;
-    eps_mp = params.eps_mp;
-    L = params.L;
-    d0 = sqrt(eps_fs / eps_mp);
-    
-    if d < d0
-        e_tx = L * E_elec + L * eps_fs * d^2;
-    else
-        e_tx = L * E_elec + L * eps_mp * d^4;
-    end
-    
-    net.energy(node_id) = max(net.energy(node_id) - e_tx, 0);
-    if net.energy(node_id) <= 0 && net.alive(node_id)
-        net.alive(node_id) = false;
-        dead_count = sum(~net.alive(1:params.N));
-        if net.FND == 0
-            net.FND = net.round;
-            fprintf('  >> FND at round %d (node %d died)\n', net.round, node_id);
-        end
-        if net.HND == 0 && dead_count >= floor(params.N / 2)
-            net.HND = net.round;
-            fprintf('  >> HND at round %d (%d nodes dead)\n', net.round, dead_count);
-        end
-    end
-end
-
-function net = deduct_energy_rx_fq(net, node_id, params)
-    e_rx = params.L * params.E_elec;
-    net.energy(node_id) = max(net.energy(node_id) - e_rx, 0);
-    if net.energy(node_id) <= 0 && net.alive(node_id)
-        net.alive(node_id) = false;
-        dead_count = sum(~net.alive(1:params.N));
-        if net.FND == 0
-            net.FND = net.round;
-            fprintf('  >> FND at round %d (node %d died)\n', net.round, node_id);
-        end
-        if net.HND == 0 && dead_count >= floor(params.N / 2)
-            net.HND = net.round;
-            fprintf('  >> HND at round %d (%d nodes dead)\n', net.round, dead_count);
-        end
-    end
 end

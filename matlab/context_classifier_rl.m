@@ -18,12 +18,8 @@ function [mode, action_idx, s] = context_classifier_rl(node_id, packet_class, ne
 U = packet_class;
 E_r = net.energy(node_id) / net.E0(node_id);
 
-% Link stability via EWMA
-alpha_ewma = 0.3;
-ack_col = net.ack_history(:, node_id);
-weights = alpha_ewma * (1 - alpha_ewma).^(0:9)';
-weights = weights / sum(weights);
-L_s = dot(weights, ack_col);
+% Link stability: live EWMA maintained by forward_to_dest (Woo & Culler, a=0.5)
+L_s = net.L_s(node_id);
 
 %% ── Step 2: Discretise state ──────────────────────────────────────────
 U_num    = class_to_num(U);
@@ -42,7 +38,8 @@ end
 % When node is nearly dead (E_r < 0.15), defer Class B/C packets
 % This is a context-aware energy preservation mechanism that only
 % CARL-WSN can perform because it differentiates traffic classes
-if E_r < 0.15 && (strcmp(U, 'B') || strcmp(U, 'C'))
+if E_r < params.T_defer && (strcmp(U, 'B') || strcmp(U, 'C')) ...
+        && net.defer_count(node_id) < params.max_defer
     mode = 'defer';
     action_idx = 0;
     return;

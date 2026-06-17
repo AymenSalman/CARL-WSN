@@ -21,6 +21,11 @@ params.W       = 30;     % ACK window  (Woo & Culler)
 params.ewma_a  = 0.5;    % smoothing   (Woo & Culler)
 
 
+
+params.w_p = 0.4;   % relay progress weight (GEAR-style; swept)
+params.w_e = 0.6;   % relay energy weight   (GEAR-style; swept)
+
+
 %% ── Overhead / discovery ────────────────────────────────────────────────
 params.T_update = 1;     % proactive table-broadcast interval (rounds)
 params.T_route  = 5;     % AODV route-cache lifetime (rounds); grounded in AODV RFC, swept
@@ -49,6 +54,11 @@ params.t_proc_ms   = 1.0;     % per-hop processing delay (ms)
 params.t_timeout_ms= 8.0;     % retransmission timeout (ms)
 
 
+params.dsdv_entry_bits = 96;   % bits per DSDV routing-table entry
+                               % (destination id + sequence no. + metric).
+                               % Full-dump fragments = ceil(N_alive*entry_bits/L).
+                               % Grounded in Perkins & Bhagwat full-dump structure; swept.
+
 %% ── Routing ───────────────────────────────────────────────────────────────
 params.zone_radius = 2;   % ZRP zone radius (hops) — base value for hybrid mode
 
@@ -58,6 +68,10 @@ params.BS_y = 100;    % BS y-coordinate (centre of area)
 params.A    = 200;    % alias for area (used by baselines)
 params.eps_fs = params.epsilon_fs;   % alias for baseline compatibility
 params.eps_mp = params.epsilon_mp;   % alias for baseline compatibility
+
+params.T_defer = 0.05;   % critical-node deferral threshold (swept)
+params.max_defer = 3;   % max consecutive deferrals before forced transmit (swept)
+params.cluster_overhead_mode = 'tdma';   % 'recluster' or 'tdma' (clustering overhead model)
 
 %% ── Simulation ────────────────────────────────────────────────────────────
 params.rounds     = 2000;   % total simulation rounds
