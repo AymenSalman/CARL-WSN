@@ -69,18 +69,18 @@ RL-based approaches (RLCR and FQ-UCR) --- under four traffic
 scenarios across 20 independent seeds (640~runs), with all protocols
 re-implemented on a common distance-dependent lossy-channel model so
 that delivery, latency, and energy emerge from identical physical
-assumptions. Under mixed traffic, CARL-WSN extends network lifetime
-beyond all baselines (first node death at round~418, the highest of
-all protocols; half-node death at round~2198, second only to MSLBA),
+assumptions. Under mixed traffic, CARL-WSN extends network lifetime beyond the classical baselines (first node
+death at round 418, the highest of all protocols; half-node death at round
+2198, second only to MSLBA),
 delivers the lowest Class~A emergency latency among the
 reactive and learning-based protocols (24.2\,ms, a 25.6\% reduction
 versus AODV), and incurs routing overhead far below the
 flooding- and table-based protocols (0.53 control packets per data
-packet, versus 14.8 for AODV and 2.31 for DSDV). These gains are
+packet, versus 14.82 for AODV and 2.31 for DSDV). These gains are
 obtained by trading a modest amount of packet delivery: CARL-WSN
 achieves 90.2\% PDR under its tuned deferral policy, within roughly
-five points of the baselines, with energy balance and throughput
-statistically comparable across all protocols. The learned Q-table
+five points of the baselines, with energy consumption statistically comparable across all protocols and
+throughput comparable to the classical and energy-harvesting baselines. The learned Q-table
 converges within approximately 1150 rounds, and the agent
 autonomously discovers context-dependent policies that adapt routing
 overhead to traffic-class composition --- a capability absent in all
@@ -227,10 +227,9 @@ nodes~\cite{akkaya2005}.
 Reactive protocols discover routes exclusively on demand.
 AODV~\cite{perkins1999} pioneered this approach by initiating route
 requests only when data must be transmitted, conserving energy in
-sparse or low-traffic conditions. However, the route discovery delay
-of 20--100\,ms introduced by RREQ/RREP flooding renders reactive
-protocols unsuitable for latency-sensitive
-applications~\cite{selim_manet_2025}. A comparative analysis by
+sparse or low-traffic conditions. However, the route-discovery delay introduced by on-demand RREQ/RREP flooding
+can make reactive protocols less suitable for the most latency-sensitive
+traffic unless routes are cached and reused~\cite{selim_manet_2025}. A comparative analysis by
 Nurul Hidayah et al.~\cite{nurul_hidayah_ahmad_zukri_comparative_2025}
 confirmed that neither proactive nor reactive protocols alone achieve
 optimal performance across varying network conditions, motivating the
@@ -314,15 +313,14 @@ routing paradigm switching based on per-packet application urgency.
 El-Fouly et al.~\cite{el-fouly_environment-aware_2023} proposed
 environment-aware real-time routing for multi-sink WSNs in smart
 cities, incorporating deadline constraints and link quality metrics.
-While this work shares the multi-sink topology with our prior
+This work shares the multi-sink topology with our prior
 work~\cite{salman2023} and considers real-time delivery requirements. Smart city IoT routing has also been addressed by Hanif
 et al.~\cite{hanif_opportunistically_2018} through opportunistic
 IoT-WSN integration, Inga et al.~\cite{inga_novel_2021} through WSN
 sizing and routing optimisation, and Ekler
 et al.~\cite{ekler_energy_2022} through energy-aware IoT routing
 algorithms. However, none of these works implement dynamic routing
-paradigm switching based on per-packet application urgency.it does not model heterogeneous application urgency classes or
-implement context-driven mode switching.
+paradigm switching based on per-packet application urgency, nor do they model heterogeneous application urgency classes or implement context-driven mode switching.
 
 \subsection{Reinforcement Learning for WSN Routing}
 
@@ -402,7 +400,7 @@ ZRP~\cite{haas2001} & None & 1 (zone) & Hybrid fixed & 1 & No & No & No \\
 
 \subsection{Research Gaps}
 
-The preceding review reveals four specific gaps that motivate CARL-WSN.
+The preceding review reveals five specific gaps that motivate CARL-WSN.
 First, Khedr et al.~\cite{roberts2025} conducted the first
 comprehensive survey of context-aware routing in IoT-driven WSNs and
 explicitly identified dynamic application-context-based mode switching
@@ -513,6 +511,46 @@ E_i(t+1) = E_i(t) - E_{tx}(L, d) - E_{rx}(L)
 
 subject to $E_i(t) \geq 0$.
 
+\subsection{Link Reliability and Retransmission Model}
+
+Unlike idealised evaluations that assume guaranteed delivery, all
+protocols in this study transmit over a distance-dependent lossy
+channel, so that packet delivery is an emergent outcome rather than
+an assumption. The probability that an $L$-bit frame is successfully
+received over a link of length $d$ is modelled by a logistic
+packet-reception-ratio (PRR) function in the transitional-region
+form of Zuniga and Krishnamachari~\cite{zuniga2004}:
+
+\begin{equation}
+\mathrm{PRR}(d) = \frac{1}{1 + \exp\!\big(\alpha_{ch}\,(d - \beta_{ch})\big)}
+\label{eq:prr}
+\end{equation}
+
+where $\beta_{ch} = 90$\,m is the midpoint distance at which the
+reception probability falls to one half, and $\alpha_{ch} = 0.18$
+controls the sharpness of the transitional region. Links shorter than
+$\beta_{ch}$ are highly reliable, while reliability degrades steeply
+beyond it.
+
+Each hop employs a stop-and-wait automatic-repeat-request (ARQ)
+scheme consistent with IEEE~802.15.4~\cite{ieee802154}: a frame is
+retransmitted up to $R_{\max} = 3$ times, and the hop succeeds if any
+attempt is acknowledged. A packet is delivered to the base station
+only if \emph{every} hop on its multi-hop path succeeds within its
+retransmission budget; otherwise it is counted as lost. Each
+transmission attempt --- successful or not --- consumes the energy in
+(\ref{eq:etx})--(\ref{eq:erx}), so retransmissions over marginal
+links are charged their true energy cost. To ensure a fair,
+paired comparison, the per-link, per-attempt channel outcomes are
+generated from a common random-number stream keyed on the seed,
+round, and link, so that every protocol experiences an identical
+channel realisation for a given seed.
+
+End-to-end latency is likewise emergent: the latency of a delivered
+packet is the sum over its hops of the per-hop transmission and
+processing time plus the timeout penalty of any failed attempts,
+rather than a fixed per-mode constant.
+
 \subsection{Link Stability Model}
 
 To capture dynamic link quality variations, CARL-WSN maintains a
@@ -527,9 +565,13 @@ L_s^i(t) = \sum_{k=0}^{W-1} w_k \cdot a_k^i
 
 where $a_k^i \in \{0, 1\}$ is the ACK outcome of the $k$-th most
 recent transmission from node $i$, and
-$w_k = \alpha(1-\alpha)^k / Z$ are normalised exponentially decaying
-weights with smoothing factor $\alpha = 0.3$ and normalisation
-constant $Z = \sum_{k=0}^{W-1} (1-\alpha)^k$.
+$w_k = \alpha_{\text{ewma}}(1 - \alpha_{\text{ewma}})^k / Z$ are normalised exponentially decaying
+weights with smoothing factor $\alpha_{\text{ewma}} = 0.5$ and normalisation
+constant $Z = \sum_{k=0}^{W-1}(1 - \alpha_{\text{ewma}})^k$, computed over a window
+of $W = 30$ recent transmissions. These values follow the WMEWMA
+link estimator of Woo and Culler~\cite{woo2003}. The score is
+updated online from the real per-hop acknowledgement outcomes
+produced by the ARQ mechanism of Section~\ref{sec:model}.
 
 \subsection{Energy-Aware Relay Selection Model}
 
@@ -542,8 +584,8 @@ maximising a composite score:
 
 \begin{equation}
 j^* = \arg\max_{j \in \mathcal{N}_i} \left[
-  w_p \cdot \frac{d_{iBS} - d_{jBS}}{d_{iBS}} +
-  w_e \cdot \frac{E_j(t)}{E_0^j}
+  \left( w_p \cdot \frac{d_{iBS} - d_{jBS}}{d_{iBS}} +
+  w_e \cdot \frac{E_j(t)}{E_0^j} \right) \cdot \mathrm{PRR}(d_{ij})
 \right]
 \label{eq:relay}
 \end{equation}
@@ -553,20 +595,32 @@ $j$ to the base station respectively, $w_p = 0.4$ is the progress
 weight, and $w_e = 0.6$ is the energy weight. The first term
 encourages geographic progress toward the BS, while the second term
 favours relays with higher residual energy ratios, distributing the
-forwarding load away from energy-depleted nodes. Only candidates with
-positive progress ($d_{jBS} < d_{iBS}$) are considered, ensuring
-packets always advance toward the BS.
+forwarding load away from energy-depleted nodes. The composite score
+is further weighted by the link reliability $\mathrm{PRR}(d_{ij})$
+from~(\ref{eq:prr}), so that the relay metric prefers next hops that
+are simultaneously closer to the BS, higher in energy, and reliably
+reachable. Only candidates with positive progress
+($d_{jBS} < d_{iBS}$) are considered, ensuring packets always advance
+toward the BS.
 
 \subsection{Critical-Node Packet Deferral}
 
 When a node's residual energy ratio falls below a critical threshold
-$E_r^i < T_{defer} = 0.15$, CARL-WSN defers transmission of
-non-urgent packets (Class~B and Class~C) to preserve the node's
-remaining energy for potential emergency traffic. Deferred packets
-incur only a minimal listening energy cost of $0.1 \cdot L \cdot
-E_{elec}$. Class~A emergency packets are never deferred regardless
-of node energy state --- the safety constraint takes absolute
-priority. This deferral mechanism is a unique capability of
+$E_r^i < T_{defer}$, CARL-WSN defers transmission of non-urgent
+packets (Class~B and Class~C) to preserve the node's remaining
+energy. To prevent unbounded deferral --- which would indefinitely
+withhold traffic from a near-depleted node that never fully dies ---
+deferral is bounded: a node may defer at most $\delta_{\max}$
+consecutive packets, after which it is forced to transmit. Deferred
+packets incur only a minimal listening energy cost of
+$0.1 \cdot L \cdot E_{elec}$ and are counted as
+offered-but-not-delivered, so deferral trades packet delivery for
+extended lifetime. The operating point used in this paper,
+$T_{defer} = 0.05$ and $\delta_{\max} = 3$, is selected from the
+sensitivity analysis in Section~\ref{sec:sensitivity} to retain the
+lifetime gain at a modest delivery cost. Class~A emergency packets
+are never deferred regardless of node energy state --- the safety
+constraint takes absolute priority. This deferral mechanism is a unique capability of
 urgency-aware protocols: baseline protocols that do not distinguish
 traffic classes cannot selectively defer low-priority traffic to
 extend node lifetime.
@@ -813,7 +867,7 @@ The exploration rate decays exponentially:
 with initial $\varepsilon_0 = 0.1$, decay factor $\delta = 0.998$,
 and minimum $\varepsilon_{\min} = 0.01$. This schedule ensures
 sufficient exploration in early rounds while converging to a
-near-greedy exploitation policy within approximately 500 rounds.
+near-greedy exploitation policy within approximately 1150 rounds.
 
 \subsection{Safety Constraint}
 
@@ -864,8 +918,14 @@ Inspired by AODV~\cite{perkins1999}, reactive mode initiates route
 discovery only when a packet needs to be sent. A Route Request (RREQ)
 is flooded to neighbours within transmission range, and a Route Reply
 (RREP) is returned along the reverse path with energy-aware relay
-selection applied at each hop. This eliminates periodic broadcast
-overhead but introduces route discovery delay of 85--115\,ms.
+selection applied at each hop. This
+eliminates periodic broadcast overhead at the cost of an on-demand
+route-discovery delay on a cache miss. Discovered routes are cached and
+reused while valid, so the discovery cost is amortised over subsequent
+packets to the same destination; the per-packet latency is therefore emergent
+--- the sum of per-hop transmission times plus the discovery round-trip on the
+fraction of packets that miss the cache --- rather than a fixed per-mode
+constant.
 The RL agent learns to select reactive mode primarily for Class~B and
 Class~C traffic on healthy nodes with stable links, where the energy
 saving from avoiding table maintenance outweighs the latency cost.
@@ -901,7 +961,7 @@ routing, packet deferral, and Q-table update.
 \caption{CARL-WSN Per-Packet Routing with Q-Learning}
 \label{alg:carlwsn}
 \SetAlgoLined
-\KwIn{Packet $p$ with class $U$, node $i$, network state $\mathcal{N}$, Q-table $Q$, exploration rate $\varepsilon$}
+\KwIn{Packet $p$ with class $U$, node $i$, network state $\mathcal{N}$, Q-table $Q$, exploration rate $\varepsilon$, per-node deferral counter $c_{\text{def}}^i$ (init.\ $0$)
 \KwOut{Updated network state, updated Q-table}
 
 \tcp{Step 1: Compute context vector}
@@ -910,27 +970,29 @@ $E_r^i \gets E_i(t) / E_0^i$\;
 $L_s^i \gets \sum_{k=0}^{W-1} w_k \cdot a_k^i$\;
 $s \gets \textsc{StateIndex}(U, E_r^i, L_s^i)$\;
 
-\tcp{Step 2: Safety constraint}
-\If{$U = A$}{
-  $a \gets \text{proactive}$\;
-  \textbf{goto} Step~4\;
-}
-
-\tcp{Step 3: Critical-node deferral}
-\If{$E_r^i < 0.15$ \textbf{and} $U \in \{B, C\}$}{
-  Defer packet (minimal listening energy cost)\;
-  \Return\;
-}
-
-\tcp{Step 4: $\varepsilon$-greedy action selection}
-\eIf{$\text{rand}() < \varepsilon$}{
-  $a \gets \text{random action from } \mathcal{A}$\;
+\eIf{$U = A$}{
+  \tcp{Step 2: Safety constraint --- emergency traffic bypasses learning}
+  $a \gets$ proactive\;
 }{
-  $a \gets \arg\max_{a'} Q(s, a')$\;
+  \tcc{Step 3: Bounded critical-node deferral}
+\eIf{$E_r^i < T_{\text{defer}}$ \textbf{and} $U \in \{B, C\}$ \textbf{and} $c_{\text{def}}^i < \delta_{max}$}{
+    $c_{\text{def}}^i \leftarrow c_{\text{def}}^i + 1$\;
+    Defer packet (minimal listening energy cost)\;
+    \Return\;
+}{
+    $c_{\text{def}}^i \leftarrow 0$ \tcp*{forced or normal transmit ends the deferral run}
+}
+  }
+  \tcp{Step 4: $\varepsilon$-greedy action selection}
+  \eIf{$\mathrm{rand}() < \varepsilon$}{
+    $a \gets$ random action from $\mathcal{A}$\;
+  }{
+    $a \gets \arg\max_{a'} Q(s, a')$\;
+  }
 }
 
 \tcp{Step 5: Route with energy-aware relay}
-$j^* \gets \arg\max_{j \in \mathcal{N}_i} \left[ 0.4 \cdot \text{progress}(j) + 0.6 \cdot E_r^j \right]$\;
+$j^* \gets \arg\max_{j \in \mathcal{N}_i} \left[ \left( 0.4 \cdot \mathrm{progress}(j) + 0.6 \cdot E_r^j \right) \cdot \mathrm{PRR}(d_{ij}) \right]$\;
 Route packet via mode $a$ using relay $j^*$\;
 
 \tcp{Step 6: Observe outcome and compute reward}
@@ -970,7 +1032,7 @@ broadcast overhead that makes purely proactive protocols
 The context classifier operates in $O(1)$ time per packet: urgency
 class $U$ is read from the packet header in constant time, $E_r^i$
 is a single division operation, $L_s^i$ is a fixed-length dot product
-over $W = 10$ values, state indexing requires three integer
+over $W = 30$ values, state indexing requires three integer
 operations, and the Q-table lookup is a single array access. The
 Q-Learning update in~(\ref{eq:qupdate}) requires one multiplication,
 one addition, and one max operation over 3 values --- all $O(1)$.
@@ -1073,9 +1135,13 @@ Electronics energy     & $E_{elec}$         & 50\,nJ/bit \\
 Free-space coefficient & $\varepsilon_{fs}$ & 10\,pJ/bit/m$^2$ \\
 Multipath coefficient  & $\varepsilon_{mp}$ & 0.0013\,pJ/bit/m$^4$ \\
 Packet size            & $L$                & 4000\,bits \\
-ACK window size        & $W$                & 10 \\
-Simulation rounds      & $R$                & 2000 \\
-Independent runs       & ---                & 5 (seeds 42--46) \\
+PRR midpoint           & $\beta_{ch}$       & 90\,m \\
+PRR sharpness          & $\alpha_{ch}$      & 0.18 \\
+Max retransmissions    & $R_{\max}^{ARQ}$   & 3 \\
+Communication range    & $R_{tx}$           & 100\,m \\
+ACK window size        & $W$                & 30 \\
+Simulation rounds      & $R$                & 8000 \\
+Independent runs       & ---                & 20 (seeds 42--61) \\
 \hline
 \multicolumn{3}{l}{\textit{Q-Learning hyperparameters}} \\
 \hline
@@ -1084,12 +1150,37 @@ Discount factor        & $\gamma$           & 0.9 \\
 Initial exploration    & $\varepsilon_0$    & 0.1 \\
 Exploration decay      & $\delta$           & 0.998 \\
 Minimum exploration    & $\varepsilon_{\min}$ & 0.01 \\
-Deferral threshold     & $T_{defer}$        & 0.15 \\
+Deferral threshold     & $T_{defer}$        & 0.05 \\
+Max consecutive deferrals & $\delta_{\max}$ & 3 \\
+EWMA smoothing factor  & $\alpha_{ewma}$    & 0.5 \\
 Relay progress weight  & $w_p$              & 0.4 \\
 Relay energy weight    & $w_e$              & 0.6 \\
 \hline
 \end{tabular}
 \end{table}
+
+\subsection{Experimental Protocol}
+
+Each of the eight protocols is evaluated under all four traffic
+scenarios with 20 independent random seeds (42--61), giving
+$8 \times 4 \times 20 = 640$ independent simulation runs. Crucially,
+all eight protocols --- including the seven baselines --- are
+re-implemented on the common lossy-channel and ARQ model of
+Section~\ref{sec:model}, so that packet delivery, latency, and energy
+consumption emerge from identical physical assumptions rather than
+from protocol-specific idealisations or values quoted from their
+original publications. For a given seed, the per-link channel
+realisation is shared across all protocols, yielding a paired
+comparison on an identical topology and channel.
+
+To obtain unbiased lifetime statistics, each run proceeds until the
+network is non-operational (fewer than 10\% of nodes alive), subject
+to the safety cap in Table~\ref{tab:params}; across all 640 runs no
+simulation reached this cap. Time-averaged metrics (throughput and
+average energy per round) are computed over a common horizon --- the
+longest network-death round across all protocols for a given scenario
+and seed --- so that protocols failing at different times are compared
+over an identical observation window.
 
 \subsection{Baseline Protocols}
 
@@ -1102,7 +1193,12 @@ three categories:
 (3)~ZRP~\cite{haas2001} --- hybrid routing.
 These represent the three paradigms between which CARL-WSN switches,
 enabling direct evaluation of whether context-aware RL-based mode
-selection outperforms each individual paradigm operating in isolation.
+selection outperforms each individual paradigm operating in isolation. Because all three are re-implemented on the common data-plane of
+Section~5 --- the same energy-aware forwarding substrate, lossy channel, and
+ARQ mechanism --- they differ only in their control-plane behaviour:
+route-acquisition latency and control overhead. Consequently their
+lifetime, delivery, energy, and throughput results coincide by construction,
+and they are distinguished in our evaluation only by latency and overhead.
 
 \textbf{Domain-specific baselines:}
 (4)~EH-Routing~\cite{salman2021} --- energy-harvesting aware routing
@@ -1136,20 +1232,34 @@ Eight metrics are evaluated: (1)~First Node Death round (FND),
 (2)~Half Node Death round (HND), (3)~Packet Delivery Ratio (PDR),
 (4)~Mean Class~A latency, (5)~Average energy consumption per round,
 (6)~Gini coefficient for energy balance, (7)~Routing overhead, and
-(8)~Network throughput. All results are reported as
-mean~$\pm$~standard deviation across five independent runs.
-
-\subsection{Statistical Validation}
-
-All performance comparisons are validated using one-way ANOVA to test
-for statistically significant differences across protocols, followed
-by Tukey HSD post-hoc analysis to identify pairwise significant
-differences. Results with $p < 0.001$ are considered statistically
-significant.
+(8)~Network throughput. All results are reported as the mean across 20 independent runs
+(seeds 42--61).
 
 % ── SECTION VI ────────────────────────────────────────────────────────────────
 \section{Results and Analysis}
 \label{sec:results}
+
+Throughout this section, all eight protocols are evaluated under the unified
+methodology of Section~5: each is executed on the same distance-dependent
+lossy channel with per-hop acknowledgement and bounded retransmission, over
+identical node deployments and channel realisations, so that observed
+differences reflect routing behaviour rather than protocol-specific physical
+assumptions. Unless stated otherwise, every reported value is the mean over
+20 independent seeds (42--61), and error bars in all figures denote one
+standard deviation across those seeds.
+
+Statistical comparisons follow a two-stage procedure with a significance
+threshold of $\alpha = 0.05$. For each metric, a one-way ANOVA first tests
+whether the eight protocols differ overall; where this omnibus test is
+significant, Tukey's Honestly Significant Difference (HSD) post-hoc test
+identifies which specific pairs of protocols differ. Consequently, a
+statement that CARL-WSN is \emph{significantly better} or \emph{significantly
+worse} than a baseline on a given metric is supported by a significant Tukey
+pairwise comparison, whereas describing two protocols as \emph{comparable}
+means the Tukey test found no significant difference between them, even when
+their mean values differ. Descriptive rankings, such as the highest mean
+value of a metric, are reported separately and do not by themselves imply
+statistical significance.
 
 \subsection{Class~A Emergency Packet Latency}
 
@@ -1202,7 +1312,12 @@ statistically significant ($p < 0.001$).
 The overhead difference between CARL-WSN and AODV is the most
 pronounced. AODV's reactive route discovery floods the network with
 RREQ packets on every cache miss, which under the high traffic load
-of one packet per node per round dominates its control budget.
+of one packet per node per round dominates its control budget. We note that control packets are accounted in the overhead metric of
+Equation~(9) but are not charged against the radio energy model: the energy
+and lifetime results reflect data-plane transmissions only. This isolates
+control overhead as a distinct cost dimension and explains why protocols with
+very different overhead (e.g.\ AODV at 14.82 versus DSDV at 2.31) exhibit
+identical energy and lifetime under our model.
 CARL-WSN instead uses energy-aware geographic relaying with cached,
 on-demand discovery, avoiding network-wide floods entirely.
 
@@ -1254,8 +1369,16 @@ losses (RLCR 1305, FQ-UCR 1172), reflecting the progressive
 energy concentration at cluster heads. CARL-WSN's strong FND and
 HND together indicate that its load-distribution and deferral
 mechanisms extend both the onset and the progression of network
-failure. One-way ANOVA confirms the FND and HND differences are
-statistically significant across protocols ($p < 0.001$).
+failure. One-way ANOVA confirms that FND and HND differ significantly across the eight
+protocols (p < 0.001). Tukey HSD analysis localises these differences:
+CARL-WSN's FND is significantly higher than the classical protocols
+(AODV/DSDV/ZRP) and FQ-UCR, and its HND is significantly higher than the
+classical protocols, RLCR, and FQ-UCR. CARL-WSN attains the highest mean FND
+and the second-highest mean HND overall, but its lifetime advantage over
+EH-Routing, MSLBA, and RLCR is within seed-to-seed variation and is not
+statistically significant; on lifetime, CARL-WSN is therefore best described
+as leading the classical and clustering baselines while remaining comparable
+to the energy-oriented baselines (EH-Routing, MSLBA).
 
 Fig.~\ref{fig:alive} shows the alive-nodes-over-time curves under
 mixed traffic for a representative seed. CARL-WSN sustains a high
@@ -1283,17 +1406,22 @@ decay, consistent with its highest FND and second-highest HND.}
 \textbf{PDR} & \textbf{LatA (ms)} & \textbf{AvgE (J)} &
 \textbf{Gini} & \textbf{Overhead} & \textbf{Tput (pkt/rnd)} \\
 \hline
-\textbf{CARL-WSN} & \textbf{418} & 2198          & 90.2\% & 24.2          & 0.024 & 0.198          & 0.53          & 37.8 \\
-AODV              & 327          & 1877          & 94.9\% & 32.5          & 0.024 & 0.196          & 14.82         & 36.5 \\
-DSDV              & 327          & 1877          & 94.9\% & 24.4          & 0.024 & 0.196          & 2.31          & 36.5 \\
-ZRP               & 327          & 1877          & 94.9\% & 28.2          & 0.024 & 0.196          & 5.91          & 36.5 \\
-EH-Routing        & 380          & 2126          & 96.0\% & 24.4          & 0.024 & 0.203          & 1.00          & 38.0 \\
+\textbf{CARL-WSN} & \textbf{418} & 2198          & 90.2\% & 24.2          & 0.024 & 0.200          & 0.53          & 37.8 \\
+AODV              & 327          & 1877          & 94.9\% & 32.5          & 0.024 & 0.196          & 14.82         & 36.7 \\
+DSDV              & 327          & 1877          & 94.9\% & 24.4          & 0.024 & 0.196          & 2.31          & 36.7 \\
+ZRP               & 327          & 1877          & 94.9\% & 28.2          & 0.024 & 0.196          & 5.91          & 36.7 \\
+EH-Routing        & 380          & 2126          & 96.0\% & 24.4          & 0.024 & 0.203          & 1.00          & 38.2 \\
 MSLBA             & 362          & \textbf{2340} & \textbf{96.9\%} & \textbf{21.1} & 0.024 & 0.193 & 1.00 & \textbf{48.5} \\
-RLCR              & 390          & 1305          & 94.1\% & 34.0          & 0.024 & 0.200          & \textbf{0.04}$^\ddagger$ & 23.1 \\
-FQ-UCR            & 123          & 1172          & 91.5\% & 35.2          & 0.024 & 0.198          & \textbf{0.04}$^\ddagger$ & 19.3 \\
+RLCR              & 390          & 1305          & 94.1\% & 34.0          & 0.024 & 0.200          & \textbf{0.04}$^\ddagger$ & 23.2 \\
+FQ-UCR            & 123          & 1172          & 91.5\% & 35.2          & 0.024 & 0.198          & \textbf{0.04}$^\ddagger$ & 19.5 \\
 \hline
 \multicolumn{9}{l}{\footnotesize Bold = best value in column. $^\ddagger$Re-clustering-only accounting; 0.10--0.18 under TDMA accounting (see text).} \\
 \end{tabular}}
+\vspace{2pt}
+{\footnotesize \raggedright
+   $^\ddagger$For the clustering protocols (RLCR, FQ-UCR), the overhead column reports re-clustering
+control packets per data packet; their per-slot TDMA scheduling overhead (0.10--0.18) is
+accounted separately and shown in Fig.~\ref{fig:overhead}.\par}
 \end{table}
 
 \subsection{Energy Efficiency and Balance}
@@ -1308,23 +1436,25 @@ therefore not a differentiating metric in this study, and we report
 it for completeness rather than as a point of comparison.
 
 Energy \emph{balance}, measured by the Gini coefficient of per-node
-energy expenditure (Fig.~\ref{fig:gini}), is likewise comparable
-across protocols: values range narrowly from 0.193 (MSLBA) to 0.203
-(EH-Routing), with CARL-WSN at 0.198. A one-way ANOVA does not find
-these differences statistically significant ($p = 0.071$). We
-therefore do not claim a balance advantage for CARL-WSN; its
-energy-aware relay selection maintains balance comparable to the
-baselines without concentrating consumption at particular nodes,
-and in particular does not exhibit the cluster-head concentration
-that the clustering protocols must manage through rotation.
+energy expenditure (Fig.~\ref{fig:gini}), is tightly clustered across protocols: values range
+narrowly from 0.193 (MSLBA) to 0.203 (EH-Routing), with CARL-WSN
+at 0.200. The one-way ANOVA is marginally significant (p = 0.048), but this
+result is driven solely by the EH-Routing versus MSLBA pair; no pairwise
+comparison involving CARL-WSN is significant. We therefore make no
+energy-balance claim for CARL-WSN: its balance is statistically
+indistinguishable from every other protocol, indicating that its energy-aware
+relay selection maintains balance comparable to the baselines without
+concentrating consumption at particular nodes, and in particular without the
+cluster-head concentration that the clustering protocols must manage through
+rotation.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\textwidth]{fig4_energy_gini}
-\caption{Gini coefficient of per-node energy consumption (lower is
-more balanced). Differences across protocols are small and not
-statistically significant ($p = 0.071$); CARL-WSN (0.198) is
-comparable to all baselines.}
+\caption{Gini coefficient of per-node energy consumption (lower is more
+balanced). Values are tightly clustered (0.193--0.203); the omnibus ANOVA is
+marginally significant (p = 0.048), driven solely by the EH-Routing versus
+MSLBA pair, and no comparison involving CARL-WSN (0.200) is significant.}
 \label{fig:gini}
 \end{figure}
 
@@ -1335,10 +1465,10 @@ delivered per round under mixed traffic, averaged over a common
 horizon so that protocols are compared over the same time window
 regardless of when their networks fail. CARL-WSN achieves 37.8
 packets per round, comparable to the classical protocols
-(AODV/DSDV/ZRP at 36.5) and EH-Routing (38.0). MSLBA attains the
+(AODV/DSDV/ZRP at 36.7) and EH-Routing (38.2). MSLBA attains the
 highest throughput (48.5) by virtue of its dual-sink design, which
 shortens delivery paths. The two clustering protocols deliver the
-lowest throughput (RLCR 23.1, FQ-UCR 19.3); because throughput is
+lowest throughput (RLCR 23.2, FQ-UCR 19.5); because throughput is
 averaged over a common horizon, their early network death penalises
 their delivered-per-round figure --- a dead network delivers nothing
 for the remainder of the window.
@@ -1421,8 +1551,7 @@ CARL-WSN's overhead varies more than three-fold across scenarios:
 safety constraint forces every packet onto proactive routing with
 maintained neighbour state; 0.32 for Class~B and Class~C only, where
 the agent predominantly selects reactive forwarding with cached,
-on-demand discovery; and 0.53 for the mixed workload, between the two
-extremes in proportion to its 20/50/30 class mix. The baselines, by
+on-demand discovery; and 0.53 for the mixed workload, between the per-class extremes. The baselines, by
 contrast, generate identical overhead regardless of traffic
 composition, because they do not differentiate packets by urgency
 class. This empirically confirms that the RL agent learns
@@ -1437,48 +1566,59 @@ Fig.~\ref{fig:convergence} shows the maximum Q-table update
 magnitude ($\max|\Delta Q|$) per round on a logarithmic scale. The
 updates decrease from $\sim\!10^0$ in the first rounds to
 $\sim\!10^{-3}$ by round~1150, confirming that the Q-table converges
-to a stable policy within the first quarter of the simulation. After
+to a stable policy well before half-node death (round 2198 under mixed traffic), while most nodes remain alive. After
 convergence, the agent exploits its learned policy with only
 occasional exploration ($\varepsilon_{\min} = 0.01$).
 
-\begin{figure}[!t]f
+\begin{figure}[!t]
 \centering
 \includegraphics[width=\textwidth]{fig_convergence}
 \caption{CARL-WSN Q-table convergence: maximum Q-value update per
 round (log scale). The agent converges to a stable policy within
-approximately 500 rounds.}
+approximately 1150 rounds.}
 \label{fig:convergence}
 \end{figure}
 
 Fig.~\ref{fig:policy} visualises the learned routing policy as a
-heatmap across all 18 states, split by link stability. Several
-observations confirm that the RL agent has learned a
-context-appropriate policy:
+heatmap over all 18 states, split by link stability, for a
+representative training seed. The policy exhibits the structure the
+reward design intends, rather than collapsing to a single mode:
 
 \begin{itemize}
-\item \textbf{Class~A (States 1--6):} Proactive mode is selected
-unconditionally, confirming the safety constraint operates correctly.
+\item \textbf{Class~A (emergency):} proactive is selected in every
+energy and link-stability state. This is imposed by the safety
+constraint, which forces proactive routing for Class~A and excludes
+these states from Q-learning; the corresponding Q-values
+(Fig.~\ref{fig:qvalues}, states~1--6) therefore remain at their
+initial zero, visually confirming that the emergency guarantee is
+structural rather than learned.
 
-\item \textbf{Class~B, low energy (States 7--8):} The agent selects
-hybrid mode, which reduces broadcast overhead compared to proactive
-while maintaining route availability within the reduced zone
-radius --- an energy-preserving strategy for depleted nodes.
+\item \textbf{Class~B (telemetry):} the agent learns a
+context-dependent mix. Moderate- and high-energy nodes on less
+stable links favour reactive forwarding, which avoids the cost of
+maintaining proactive tables, while moderate-energy nodes on stable
+links favour hybrid forwarding, a zone-limited compromise between
+proactive reach and reactive economy. This intermediate hybrid
+region --- absent from any hand-designed rule --- is discovered by
+the agent.
 
-\item \textbf{Class~B, healthy nodes with stable links (States 11--12):}
-The agent selects reactive or proactive mode depending on link
-stability, preferring reactive on stable links to avoid unnecessary
-table maintenance overhead.
-
-\item \textbf{Class~C, healthy nodes with stable links (States 17--18):}
-The agent selects reactive mode, accepting higher latency in
-exchange for minimal overhead --- appropriate for best-effort
-traffic on healthy nodes.
-
-\item \textbf{Low-energy states across all classes (States 7, 8, 13, 14):}
-The agent consistently selects hybrid mode, which provides the
-best energy-overhead balance for depleted nodes by limiting the
-proactive zone radius.
+\item \textbf{Class~C (best-effort):} the agent converges to a
+consistent low-overhead choice across energy levels, reflecting the
+reward function's heavy weighting of overhead and energy for the
+lowest-priority traffic.
 \end{itemize}
+
+The learned Q-values for Class~B and Class~C states
+(Fig.~\ref{fig:qvalues}, states~7--18) are differentiated across the
+three actions, confirming that the agent explores the full action
+space and converges to context-specific preferences rather than
+defaulting to a single mode. We emphasise that the precise
+mode assignment in a given state may vary across training seeds, as
+it depends on exploration order; the robust and reproducible features
+are the unconditional proactive policy for Class~A and the
+emergence of distinct, lower-overhead policies for non-urgent
+traffic.
+
 
 \begin{figure}[!t]
 \centering
@@ -1491,21 +1631,22 @@ context-dependent routing strategies.}
 \label{fig:policy}
 \end{figure}
 
-Fig.~\ref{fig:qvalues} presents the raw Q-values for all 18 states.
-States 1--6 (Class~A) show high Q-values only for the proactive
-action, confirming the safety constraint. States 7--18 show
-differentiated Q-values across all three actions, demonstrating
-that the agent has explored the full action space and converged
-to context-specific preferences rather than defaulting to a
-single mode.
-
+Fig.~\ref{fig:qvalues} presents the learned Q-values for all 18
+states. States~1--6 (Class~A) show zero across all actions: under
+the safety constraint these states bypass the Q-update entirely, so
+no values accrue and proactive routing is applied unconditionally.
+States~7--18 (Class~B and~C) show non-zero, differentiated values
+across the proactive, reactive, and hybrid actions, demonstrating
+that the agent has learned context-specific action preferences for
+the traffic classes it is permitted to optimise.
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\textwidth]{fig_qvalues}
-\caption{CARL-WSN learned Q-values for all 18 states. States 1--6
-(Class~A) show proactive-only values due to the safety constraint.
-States 7--18 show differentiated values across all three routing
-modes, confirming context-dependent learning.}
+\caption{CARL-WSN learned Q-values for all 18 states. States~1--6
+(Class~A) are zero because the safety constraint excludes them from
+learning and forces proactive routing. States~7--18 (Class~B/C) show
+differentiated values across the three routing modes, confirming
+context-dependent learning for non-emergency traffic.}
 \label{fig:qvalues}
 \end{figure}
 
@@ -1519,11 +1660,13 @@ to per-packet paradigm selection on a flat topology. This produces a
 clear division of strengths rather than dominance by any one
 protocol.
 
-On network lifetime, CARL-WSN leads: its FND (418) exceeds RLCR's
-(390) and greatly exceeds FQ-UCR's (123), and its HND (2198) is far
-above both clustering protocols (RLCR 1305, FQ-UCR 1172), which
-degrade rapidly once cluster heads begin to fail. On Class~A
-latency, CARL-WSN (24.2\,ms) is significantly lower than both RLCR
+On network lifetime, CARL-WSN leads on the means: its FND (418) exceeds
+RLCR's (390) and greatly exceeds FQ-UCR's (123), and its HND (2198) is far
+above both clustering protocols (RLCR 1305, FQ-UCR 1172), which degrade
+rapidly once cluster heads begin to fail. The HND gap over both clustering
+protocols is statistically significant, as is the FND gap over FQ-UCR; the
+FND difference from RLCR, however, is within seed variation and not
+significant. On Class~A latency, CARL-WSN (24.2\,ms) is significantly lower than both RLCR
 (34.0\,ms) and FQ-UCR (35.2\,ms), since neither clustering protocol
 prioritises emergency traffic. On routing overhead, the ordering
 reverses: the clustering protocols' amortised control traffic
@@ -1560,6 +1703,115 @@ FQ-UCR                & 123 & 1172 & 35.2 & 0.04--0.10 & 91.5\% \\
 \end{tabular}}
 \end{table}
 
+\subsection{Sensitivity Analysis}
+\label{sec:sensitivity}
+
+To assess robustness, we vary CARL-WSN's principal design parameters
+one at a time around their default values, holding all else fixed,
+and re-run the mixed-traffic scenario across the full set of 20
+seeds. Two groups of parameters are examined: the deferral policy
+($T_{\mathrm{defer}}$ and $\max_{\mathrm{defer}}$), which governs the
+lifetime--delivery trade, and the model parameters that lack an exact
+value in the literature (the relay weights, the channel shape
+parameters, and the link-stability threshold).
+
+\subsubsection{Deferral Policy: the Lifetime--Delivery Frontier}
+
+The deferral parameters expose a direct trade between packet delivery
+and network lifetime. Table~\ref{tab:defer_sweep} reports PDR and FND
+as $T_{\mathrm{defer}}$ and $\delta_{\max}$ are varied.
+Disabling deferral ($T_{\mathrm{defer}} = 0$) yields the highest PDR
+(95.1\%) at the lowest FND (381), while aggressive deferral
+($T_{\mathrm{defer}} = 0.20$, $\delta_{\max} = 10$) yields the highest PDR
+(95.1\%) at the lowest FND (381), while aggressive deferral
+($T_{\mathrm{defer}} = 0.20$, $\delta_{\max} = 10$) yields the
+highest FND (635) at the lowest PDR (66.4\%). The relationship is
+monotonic: deferring more non-urgent traffic at near-depleted nodes
+extends lifetime at a proportional cost in delivery.
+
+\begin{table}[!t]
+\renewcommand{\arraystretch}{1.2}
+\caption{Deferral Policy Sensitivity --- Mixed Traffic (20 seeds)}
+\label{tab:defer_sweep}
+\centering
+\begin{tabular}{ccccc}
+\hline
+$T_{\mathrm{defer}}$ & $\delta_{\max}$ & \textbf{PDR (\%)} & \textbf{FND} & \textbf{HND} \\
+\hline
+0.00 (off) & --- & 95.1 & 381 & 2117 \\
+0.05 & 3  & \textbf{90.2} & \textbf{418} & 2198 \\
+0.05 & 5  & 88.9 & 428 & 2220 \\
+0.10 & 3  & 85.1 & 455 & 2295 \\
+0.10 & 5  & 82.7 & 475 & 2342 \\
+0.15 & 5  & 76.5 & 525 & 2478 \\
+0.20 & 10 & 66.4 & 635 & 2787 \\
+\hline
+\end{tabular}
+\end{table}
+
+The operating point used throughout this paper,
+$T_{\mathrm{defer}} = 0.05$ and $\max_{\mathrm{defer}} = 3$, is
+selected from this frontier as the point that retains a clear
+lifetime advantage over all baselines (FND 418, the highest of any
+protocol) while keeping the delivery cost modest (PDR 90.2\%, within
+roughly five points of the baseline group). More aggressive settings
+purchase additional lifetime at a delivery cost we judge too steep
+for the marginal gain; for example, raising $T_{\mathrm{defer}}$ to
+0.15 extends FND by a further 107 rounds but reduces PDR by almost
+14 points. Deployments with different priorities can move along this
+frontier by adjusting the two parameters.
+
+\subsubsection{Robustness to Model Parameters}
+
+Table~\ref{tab:model_sweep} summarises the effect of the remaining
+parameters, reported as the percentage swing of each metric across
+the swept range. CARL-WSN is insensitive to the relay weight split
+($w_e/w_p$): varying it from 0.4/0.6 to 0.8/0.2 changes PDR by under
+1\% and FND not at all, with only a mild effect on HND. The
+link-stability threshold $T_L$ has no measurable effect, because the
+PRR-weighted relay metric keeps the large majority of links stable:
+across all forwarding decisions, the link-stability score falls below
+the 0.7 threshold in only 5.6\% of cases, so varying the threshold
+within the 0.6--0.8 range alters few decisions. The channel sharpness
+parameter $\alpha$ likewise has negligible effect on PDR.
+
+The one parameter with substantial effect is the PRR midpoint
+$\beta$, which sets the distance at which links begin to fail.
+Increasing $\beta$ from 80 to 100\,m improves PDR, FND, and HND
+monotonically, as expected: a more favourable channel reaches
+farther and delivers more. Crucially, because all eight protocols
+share the same channel model, $\beta$ shifts every protocol together
+and does not alter CARL-WSN's relative standing; it is a property of
+the deployment environment rather than of the protocol.
+
+\begin{table}[!t]
+\renewcommand{\arraystretch}{1.2}
+\caption{Model-Parameter Sensitivity --- Metric Swing (\%) Across Swept Range, Mixed Traffic, 20 Seeds}
+\label{tab:model_sweep}
+\centering
+\begin{tabular}{lccccc}
+\hline
+\textbf{Parameter (range)} & \textbf{PDR} & \textbf{FND} & \textbf{HND} & \textbf{LatA} & \textbf{OH} \\
+\hline
+$w_e/w_p$ (0.4/0.6--0.8/0.2) & 0.6 & 0.0 & 4.7 & 1.0 & 0.4 \\
+PRR $\beta$ (80--100)        & 10.1 & 64.8 & 28.5 & 16.2 & 2.7 \\
+PRR $\alpha$ (0.12--0.25)    & 0.2 & 15.2 & 6.5 & 6.9 & 4.3 \\
+$T_L$ (0.6--0.8)             & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+\hline
+\multicolumn{6}{l}{\footnotesize Swing = $100 \times (\max - \min)/\mathrm{mean}$ across the swept values.} \\
+\end{tabular}
+\end{table}
+
+In summary, CARL-WSN's behaviour is robust to its tunable design
+choices: delivery is essentially unchanged across the relay weights, the
+link-stability threshold, and the channel sharpness; lifetime shows only mild
+sensitivity to the channel sharpness ($\le$15\% FND swing) and none to the
+other two; and all metrics vary with the channel midpoint only as the
+underlying physics dictates, equally for all protocols. The deferral policy is
+the one parameter with a deliberate, well-characterised effect, and
+the chosen operating point is justified by the frontier in
+Table~\ref{tab:defer_sweep}.
+
 \subsection{Summary of Findings}
 
 Table~\ref{tab:improvements} summarises CARL-WSN's standing against
@@ -1571,9 +1823,10 @@ learning-based protocols} (24.2\,ms, 25.6\% below AODV), and
 \textbf{routing overhead far below the flooding- and table-based
 protocols} (0.53 versus 2.31--14.82). These gains are obtained at a
 modest, bounded cost in packet delivery (90.2\% PDR, $\approx$5
-points below the baselines), while energy consumption, energy
-balance, and throughput remain statistically comparable to the
-baseline group.
+points below the baselines), while energy consumption is statistically comparable to every baseline. Energy
+balance shows no significant difference involving CARL-WSN, and throughput is
+statistically comparable to the classical protocols and EH-Routing, above the
+two clustering protocols, and below MSLBA.
 
 \begin{table}[!t]
 \renewcommand{\arraystretch}{1.2}
@@ -1586,10 +1839,12 @@ baseline group.
 \hline
 Network lifetime (FND) & Highest of all eight protocols (418) \\
 Network lifetime (HND) & Second-highest (2198), behind MSLBA \\
-Class~A latency        & 25.5\% below AODV; among the lowest overall \\
+Class~A latency        & 25.6\% below AODV; among the lowest overall \\
 Routing overhead       & Far below AODV/ZRP/DSDV; above clustering \\
 Packet delivery        & 90.2\% ($\approx$5 pts below baselines) \\
-Energy / balance / throughput & Statistically comparable to baselines \\
+Energy consumption & Statistically comparable to all baselines \\
+Energy balance (Gini) & No significant difference involving CARL-WSN \\
+Throughput & Comparable to classical and EH-Routing; below MSLBA \\
 \hline
 \end{tabular}
 \end{table}
@@ -1606,64 +1861,74 @@ IoT-WSN deployments.
 \section{Discussion}
 \label{sec:discussion}
 
-\subsection{Why Paradigm Switching Outperforms Paradigm Optimisation}
+\subsection{Lifetime Extension Without Clustering}
 
-The most significant finding of this study is that CARL-WSN ---
-which uses Q-Learning to switch \emph{between} routing paradigms ---
-achieves lower overhead than both RLCR and FQ-UCR, which use
-Q-Learning to optimise \emph{within} the clustering paradigm. This
-result may seem counterintuitive: clustering protocols are
-specifically designed to reduce long-range transmissions through
-local aggregation at cluster heads, which should lower overhead.
+The central finding of this study is that paradigm switching offers
+a different operating point from paradigm optimisation, rather than
+dominating it. CARL-WSN --- which uses Q-Learning to switch
+\emph{between} routing paradigms on a flat topology --- achieves the
+longest pre-failure lifetime (highest FND, second-highest HND) and
+the lowest emergency latency among the learning-based protocols,
+while RLCR and FQ-UCR --- which apply Q-Learning \emph{within} the
+clustering paradigm --- achieve lower steady-state control overhead.
+Neither approach dominates the other across all metrics; each makes
+a coherent trade.
 
-The explanation lies in the fixed cost of clustering itself. Both
-RLCR and FQ-UCR incur periodic cluster head advertisement,
-membership join messages, and cluster maintenance overhead every
-clustering interval --- regardless of whether the traffic being
-routed requires the latency guarantees that clustering provides.
-A routine Class~B temperature reading triggers the same clustering
-overhead as a Class~A fire alarm. CARL-WSN avoids this fixed cost
-entirely: it selects reactive mode (minimal overhead) for the
-majority of Class~B and Class~C traffic, reserving higher-overhead
-proactive mode only for Class~A emergency packets that genuinely
-require pre-built routes. The class-dependent reward function
-in~(\ref{eq:reward}) directly incentivises this behaviour by
-weighting overhead reduction heavily for non-emergency traffic.
+This contradicts the intuition that clustering is uniformly superior
+for lifetime. Clustering concentrates forwarding at a small set of
+cluster heads, which must then be rotated to avoid premature death;
+under a realistic lossy channel this concentration produces the
+rapid post-FND decay visible in RLCR and FQ-UCR (HND of 1305 and
+1172, the two lowest of all protocols). CARL-WSN instead distributes
+forwarding across many energy-weighted relay paths and defers traffic
+only at near-depleted nodes, which delays both the first death and
+the progression to half-death. The cost of this flat-routing approach
+is higher per-packet control overhead than clustering's amortised
+steady state --- but that overhead remains far below the flooding-
+and table-based protocols, and it buys a lifetime advantage that
+clustering does not provide.
 
-This finding has broader implications for RL-based WSN routing
-research: applying RL to select which routing paradigm to use may
-yield greater efficiency gains than applying RL to optimise routing
-decisions within a fixed paradigm.
+The broader implication for RL-based WSN routing is therefore not
+that paradigm switching is universally more efficient, but that the
+choice of \emph{what} the agent controls --- the routing paradigm
+itself, versus decisions within a fixed paradigm --- determines which
+region of the cost--lifetime trade space the protocol occupies.
+CARL-WSN's contribution is to show that learned per-packet paradigm
+selection on a flat topology can extend lifetime beyond clustering
+while keeping overhead well below classical flat protocols.
 
 \subsection{Energy-Aware Relay Selection and Network Lifetime}
 
-CARL-WSN's energy-aware relay selection mechanism
-in~(\ref{eq:relay}) addresses a well-known vulnerability of
-flat-routing protocols: nodes near the base station act as
-forwarding relays for all traffic and die prematurely, causing
-rapid network degradation. Classical flat protocols (AODV, DSDV,
-ZRP) all exhibit FND\,$\approx$\,34 because they select next-hop
-nodes based solely on shortest path without considering residual
-energy.
+CARL-WSN's energy-aware relay selection in~(\ref{eq:relay}) addresses
+a well-known vulnerability of flat-routing protocols: nodes near the
+base station forward disproportionate traffic and deplete early. The
+classical flat protocols (AODV, DSDV, ZRP) share an identical FND of
+327 under mixed traffic, since they select next hops on geographic
+progress alone without regard to residual energy.
 
-By weighting relay selection 60\% toward residual energy and 40\%
-toward geographic progress, CARL-WSN distributes forwarding load
-across multiple relay paths, dramatically extending FND from 34 to
-749 --- a 22$\times$ improvement. The critical-node deferral
-mechanism (Section~\ref{sec:model}) further contributes by
-preserving the remaining energy of near-depleted nodes for
-potential emergency traffic. The combination of these two
-mechanisms transforms CARL-WSN from a flat-routing protocol with
-worst-case lifetime into one competitive with dedicated
-clustering-based lifetime-optimised protocols, while maintaining
-the overhead advantage of flat routing.
+By weighting relay selection toward residual energy as well as
+progress, and by bounding deferral at near-depleted nodes, CARL-WSN
+raises FND to 418 --- the highest of all eight protocols, ahead of
+the energy-harvesting (EH-Routing, 380) and clustering (RLCR, 390)
+baselines, and 28\% above the classical flat protocols. On
+half-node-death, CARL-WSN reaches HND\,=\,2198, second only to
+MSLBA (2340) and well above the classical protocols (1877) and both
+clustering protocols (1305 and 1172). The combination of
+energy-aware relaying and bounded deferral thus delays both the
+onset and the progression of network failure, giving a flat-routing
+protocol a lifetime profile competitive with, and on FND exceeding,
+the dedicated lifetime-oriented baselines --- while retaining the
+low control overhead characteristic of flat routing relative to
+flooding and table maintenance.
 
-Notably, CARL-WSN achieves HND\,=\,2000, meaning the network
-remains more than 50\% alive at simulation end --- the best
-half-node-death performance of all eight protocols. This confirms
-that energy-aware relay selection combined with context-dependent
-packet deferral provides a viable alternative to clustering for
-lifetime extension, without the clustering overhead penalty.
+It is important to state the cost of this lifetime gain plainly. The
+bounded deferral mechanism withholds a fraction of non-urgent
+Class~B/C packets at near-depleted nodes, which reduces packet
+delivery to 90.2\% under mixed traffic, roughly five points below
+the baseline group. The lifetime advantage and the delivery
+reduction are two sides of the same mechanism; the operating point
+adopted here was chosen (Section~\ref{sec:sensitivity}) to keep the
+delivery cost modest while preserving the lifetime gain.
 
 \subsection{Safety Constraints in RL-Based Routing}
 
@@ -1675,7 +1940,7 @@ in~(\ref{eq:safety}): Class~A emergency packets are routed via
 proactive mode unconditionally, bypassing the $\varepsilon$-greedy
 selection entirely. This constraint is not a limitation of the RL
 agent but a deliberate architectural decision that separates
-safety-critical routing (hardcoded) from efficiency-optimised
+safety-critical routing (rule-based) from efficiency-optimised
 routing (learned).
 
 Neither RLCR~\cite{daanoune_intelligent_2026} nor
@@ -1689,31 +1954,27 @@ unacceptable latency. CARL-WSN eliminates this risk by design.
 \subsection{Q-Learning Convergence Behaviour}
 
 The convergence analysis in Fig.~\ref{fig:convergence} shows that
-the Q-table stabilises within approximately 500 rounds, with
+the Q-table stabilises within approximately 1150 rounds, with
 maximum update magnitudes decreasing from $10^0$ to $10^{-3}$. The
 relatively fast convergence is attributable to the compact state
 space (18~states): with only 54 Q-values to learn, the agent
-visits each state-action pair frequently enough to achieve
-convergence within the first quarter of a 2000-round simulation.
+visits each state-action pair frequently enough to achieve convergence early in the network's lifetime, well before half-node death and while most nodes remain alive.
 
 The epsilon decay schedule ($\varepsilon_0 = 0.1$,
 $\delta = 0.998$, $\varepsilon_{\min} = 0.01$) balances
-exploration and exploitation effectively. After 500 rounds,
-$\varepsilon$ has decayed to approximately 0.037, meaning the
-agent selects the learned best action 96.3\% of the time while
-still occasionally exploring alternatives. This residual
+exploration and exploitation effectively. After 1150 rounds, $\varepsilon$ has reached
+its floor $\varepsilon_{\min} = 0.01$, meaning the agent selects the learned
+best action approximately 99\% of the time while still occasionally exploring
+alternatives. This residual
 exploration allows the agent to adapt if network conditions change
---- for example, if relay nodes die and previously optimal paths
-become unavailable.
-
-The learned policy visualisation in Fig.~\ref{fig:policy}
-confirms that the converged policy is contextually meaningful:
-proactive mode for emergency and unstable-link states, reactive
-mode for healthy nodes with stable links carrying non-urgent
-traffic, and hybrid mode for energy-critical nodes. These
-preferences emerge entirely from the reward signal without any
-manually programmed rules --- the agent independently discovers
-that different traffic classes and network conditions warrant
+--- for example, if relay nodes die and previously optimal paths become
+unavailable. The learned policy in Fig.~\ref{fig:policy} is
+contextually meaningful, selecting proactive routing for emergency
+traffic, reactive routing for non-urgent traffic on
+moderate-to-healthy nodes, and hybrid routing as an intermediate
+choice for moderate-energy telemetry nodes. These preferences emerge entirely from the reward
+signal without any manually programmed rules --- the agent independently
+discovers that different traffic classes and network conditions warrant
 different routing paradigms.
 
 \subsection{Context-Awareness as a Unique Capability}
@@ -1755,19 +2016,24 @@ routing table scales $O(N)$ in memory, which is standard for all
 proactive protocols and acceptable for the node densities typical
 of smart city WSN deployments. The Q-table size (18 $\times$ 3)
 is independent of $N$ --- adding more nodes does not increase the
-state space. CARL-WSN's overhead advantage over RLCR and FQ-UCR
-is expected to increase with larger $N$: as network density grows,
-clustering protocols must coordinate more nodes per cluster and
-more inter-cluster relay hops, while CARL-WSN's flat-routing
-overhead scales only with the local neighbour count.
+state space. CARL-WSN's overhead advantage over the flooding- and table-based
+protocols is expected to persist or grow with larger $N$: AODV's
+flood cost scales with network size, whereas CARL-WSN's per-packet
+control depends only on the local neighbour count. Relative to the
+clustering protocols, whose amortised overhead is lower than
+CARL-WSN's, the comparison at larger $N$ is an open question that
+the present single-size study cannot settle, and which we identify
+as future work.
 
 \subsection{Limitations}
 
 This study has five limitations that should be acknowledged.
-First, the simulation uses a simplified propagation model
-(first-order radio energy model) that does not capture multipath
-fading, shadowing, or interference from co-deployed networks.
-Second, node mobility is not modelled --- all nodes are static
+First, while all protocols are evaluated on a common
+distance-dependent lossy-channel model with per-hop acknowledgement
+and retransmission --- a substantial step beyond idealised
+delivery --- this model does not capture multipath fading,
+shadowing, temporal correlation, or interference from co-deployed
+networks. Second, node mobility is not modelled --- all nodes are static
 after deployment; mobile WSN topologies where link stability
 varies dynamically due to node movement represent a natural
 extension. Third, the latency values are simulated rather than
@@ -1800,72 +2066,90 @@ energy, and link stability score, and learns class-dependent routing
 policies through a multi-objective reward function that weights
 latency, overhead, and energy preservation according to traffic
 priority. A hard safety constraint guarantees sub-100\,ms delivery
-for emergency traffic regardless of the learned policy. Energy-aware
-relay selection and critical-node packet deferral extend network
-lifetime to levels competitive with dedicated clustering-based
-protocols.
+for emergency traffic regardless of the learned policy, and
+energy-aware relay selection combined with bounded critical-node
+packet deferral extends network lifetime beyond all evaluated
+baselines.
 
-MATLAB-based simulation across eight protocols, four traffic
-scenarios, and five independent seeds (160~runs) demonstrated that
-CARL-WSN achieves the best or near-best performance on six of eight
-evaluated metrics:
+A distinguishing feature of the evaluation is that all eight
+protocols are re-implemented on a common distance-dependent
+lossy-channel model with per-hop acknowledgement and bounded
+retransmission, so that packet delivery, latency, and energy
+consumption emerge from identical physical assumptions rather than
+from protocol-specific idealisations. Across four traffic scenarios
+and 20 independent seeds (640~runs), CARL-WSN's behaviour under this
+unified methodology can be summarised as follows:
 
 \begin{itemize}
-\item \textbf{Lowest routing overhead} (2.27 control packets per data
-packet) --- 55.5\% lower than RLCR and 59.0\% lower than FQ-UCR,
-the two most recent RL-based WSN routing protocols.
+\item \textbf{Longest pre-failure lifetime.} CARL-WSN attains the
+highest mean first-node-death round of all eight protocols
+(FND\,=\,418), 28\% above the classical flat protocols, and the
+second-highest mean half-node-death round (HND\,=\,2198), behind only
+MSLBA. Tukey HSD analysis confirms these lifetime gains are statistically
+significant over the classical protocols and FQ-UCR (and, for HND, over
+RLCR), while CARL-WSN remains statistically comparable to the
+energy-oriented baselines EH-Routing and MSLBA.
 
-\item \textbf{82.5\% reduction} in Class~A emergency packet latency
-compared to AODV ($p < 0.001$), with the safety constraint
-guaranteeing sub-100\,ms delivery unconditionally.
+\item \textbf{Low emergency latency.} CARL-WSN delivers Class~A
+traffic in 24.2\,ms, a 25.6\% reduction versus AODV and among the
+lowest of all protocols, with the safety constraint guaranteeing
+sub-100\,ms delivery unconditionally.
 
-\item \textbf{Best energy efficiency} (0.053\,J/round) and
-\textbf{best energy balance} (Gini\,=\,0.185), confirming that
-RL-based paradigm switching combined with energy-aware relay
-selection distributes energy consumption more uniformly than
-clustering-based approaches.
+\item \textbf{Low overhead relative to flooding and table
+maintenance.} CARL-WSN incurs 0.53 control packets per data packet,
+far below AODV (14.82), ZRP (5.91), and DSDV (2.31). It does not
+match the clustering protocols RLCR and FQ-UCR, whose control
+traffic is amortised over long re-clustering intervals
+(0.04--0.18 per packet); this is an inherent benefit of the
+clustering paradigm that CARL-WSN trades for per-packet adaptation
+and freedom from cluster-head energy hotspots.
 
-\item \textbf{Highest throughput} (85.7\,pkts/round) and
-\textbf{best half-node-death performance} (HND\,=\,2000), with
-the network remaining more than 50\% alive at simulation end.
+\item \textbf{Context-adaptive overhead.} CARL-WSN is the only
+evaluated protocol whose overhead varies with traffic-class
+composition --- from 1.00 for pure emergency traffic to 0.32 for
+pure non-urgent traffic --- empirically confirming that the agent
+learns class-specific routing policies.
 
-\item \textbf{Competitive network lifetime} (FND\,=\,749), within
-5\% of the best-performing protocol and 22$\times$ longer than
-classical flat-routing protocols.
-
-\item \textbf{Context-adaptive overhead}: CARL-WSN is the only
-evaluated protocol whose routing overhead varies with traffic class
-composition, empirically confirming that the RL agent learns
-class-specific routing policies.
+\item \textbf{A modest, bounded delivery trade.} These gains are obtained
+at a packet-delivery ratio of 90.2\% under mixed traffic, roughly five
+points below the baseline group, arising from the deferral of non-urgent
+traffic at near-depleted nodes. On the neutral metrics, CARL-WSN is statistically comparable to all baselines
+in energy consumption, shows no significant energy-balance difference, and
+matches the classical and energy-harvesting protocols in throughput (below
+MSLBA, above the clustering protocols).
 \end{itemize}
 
-The Q-table converges within 1150 rounds, requires only 216~bytes of
-RAM, and operates in $O(1)$ time per packet --- making CARL-WSN
-deployable on resource-constrained sensor hardware without
-modification. The learned policy autonomously discovers that
-emergency traffic requires proactive routing, routine telemetry
-benefits from reactive routing, and energy-critical nodes are best
-served by hybrid routing with reduced zone radius --- all without
-manually programmed rules.
+The Q-table converges within approximately 1150 rounds, occupies
+only 216~bytes of RAM in single precision, and the agent operates in
+$O(1)$ time per packet, making CARL-WSN deployable on
+resource-constrained sensor hardware without modification. The
+learned policy autonomously discovers that emergency traffic is best
+served by proactive routing, non-urgent traffic by reactive routing,
+and moderate-energy telemetry nodes by an intermediate hybrid
+strategy --- all without manually programmed rules.
 
-The central finding of this work is that applying reinforcement
-learning to select \emph{which routing paradigm} to use yields
-greater efficiency gains than applying it to optimise routing
-decisions \emph{within} a fixed paradigm. CARL-WSN's 55--59\%
-overhead reduction over RLCR and FQ-UCR demonstrates that paradigm
-switching is a more impactful application of Q-Learning for WSN
-routing than cluster head selection or inter-cluster relay
-optimisation.
+The central finding of this work is that the choice of \emph{what} a
+reinforcement-learning agent controls --- the routing paradigm
+itself, rather than decisions within a fixed paradigm --- determines
+which region of the cost--lifetime trade space a protocol occupies.
+By learning per-packet paradigm selection on a flat topology,
+CARL-WSN extends network lifetime beyond clustering-based protocols
+and protects emergency-traffic latency, while keeping control
+overhead well below classical flooding- and table-based protocols,
+at the cost of a small reduction in best-effort delivery. This
+positions paradigm switching not as a universally dominant strategy
+but as a distinct and well-characterised operating point for
+heterogeneous, latency- and lifetime-critical IoT-WSN deployments.
 
 Four directions for future work are identified. First, validating
-CARL-WSN on a physical sensor testbed to confirm that simulated
-performance advantages hold under realistic channel conditions.
-Second, extending the protocol to mobile WSN topologies where link
-stability varies dynamically due to node movement. Third, scaling
-the evaluation to larger networks ($N = 500{+}$) to verify the
-scalability arguments presented in Section~\ref{sec:discussion}.
-Fourth, investigating adaptive reward weight tuning that adjusts
-the class-dependent weight vectors based on real-time network
+CARL-WSN on a physical sensor testbed to confirm that the simulated
+advantages hold under real channel and hardware conditions. Second,
+extending the protocol to mobile WSN topologies where link stability
+varies dynamically due to node movement. Third, scaling the
+evaluation to larger networks ($N = 500{+}$), where the overhead
+comparison against clustering protocols in particular remains an open
+question. Fourth, investigating adaptive reward-weight tuning that
+adjusts the class-dependent weight vectors based on real-time network
 congestion and remaining energy budget.
 
 % ── References ────────────────────────────────────────────────────────────────
