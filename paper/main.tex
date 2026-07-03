@@ -76,7 +76,10 @@ delivers the lowest Class~A emergency latency among the
 reactive and learning-based protocols (24.2\,ms, a 25.6\% reduction
 versus AODV), and incurs routing overhead far below the
 flooding- and table-based protocols (0.53 control packets per data
-packet, versus 14.82 for AODV and 2.31 for DSDV). These gains are
+packet, versus 14.82 for AODV and 2.31 for DSDV). The lifetime gain stems from energy-aware relay selection
+and bounded critical-node deferral, which the per-packet urgency signal
+enables, while the learned paradigm switching contributes the
+context-adaptive overhead and the emergency-latency protection. These gains are
 obtained by trading a modest amount of packet delivery: CARL-WSN
 achieves 90.2\% PDR under its tuned deferral policy, within roughly
 five points of the baselines, with energy consumption statistically comparable across all protocols and
@@ -449,7 +452,7 @@ simulation round $t$, and dead otherwise. Dead nodes neither transmit
 nor receive. The network is considered operational as long as at least
 10\% of nodes remain alive.
 
-\subsection{Traffic Model}
+\subsection{Traffic Model}\label{sec:traffic_model}
 
 Smart city IoT deployments generate heterogeneous application traffic
 with fundamentally different QoS requirements. This paper models three
@@ -710,7 +713,7 @@ The routing paradigm selection problem is formulated as a Markov
 Decision Process $(\mathcal{S}, \mathcal{A}, R, \gamma)$ where each
 packet transmission constitutes one decision step.
 
-\subsubsection{State Space}
+\subsubsection{State Space}\label{sec:state_space}
 
 The continuous context vector is discretised into a finite state space
 suitable for tabular Q-Learning:
@@ -946,9 +949,14 @@ r_{zone}^i = \begin{cases}
 \end{equation}
 
 The RL agent learns to select hybrid mode primarily for energy-critical
-nodes carrying non-emergency traffic, where the reduced zone radius
-limits broadcast overhead while maintaining route availability within
-the immediate neighbourhood.
+nodes carrying non-emergency traffic, where the reduced zone radius limits
+broadcast overhead while maintaining route availability within the immediate
+neighbourhood. Note that the $0.6$ energy cut-off defining the healthy zone
+radius here is distinct from the $0.7$ residual-energy boundary used to
+discretise the state space in Section~\ref{sec:state_space}: the former tunes
+the continuous zone-radius response of the hybrid mode, whereas the latter sets
+the coarse energy level fed to the tabular Q-agent. The two thresholds control
+different mechanisms and are therefore set independently.
 
 \subsection{Complete Per-Packet Routing Procedure}
 
@@ -1098,20 +1106,30 @@ $\lambda_C = 0.1$\,packets/s, best-effort delivery.
 \end{itemize}
 
 Four traffic scenarios are evaluated: Class~A only, Class~B only,
-Class~C only, and Mixed. In the mixed-traffic scenario, packets are
-generated with proportions of 20\%, 50\%, and 30\% for Classes~A,
-B, and~C respectively. In all four scenarios, the total traffic
-volume per round is held constant --- only the class composition
-varies. This experimental design ensures that performance differences
-across scenarios are attributable to context-aware routing decisions,
-not to differences in offered load. Consequently, baseline protocols
-that do not differentiate traffic classes produce identical
-performance across all scenarios, while CARL-WSN's metrics vary as
-the RL agent selects different routing modes for different class
-compositions. These proportions reflect a realistic smart city IoT
-deployment in which emergency events are infrequent, periodic
-environmental monitoring dominates network traffic, and event-driven
-sensing forms an intermediate
+Class~C only, and Mixed. In the mixed-traffic scenario, each alive node
+generates one packet per round, and the packet's class is assigned
+probabilistically at generation time according to the target proportions
+of 20\%, 50\%, and 30\% for Classes A, B, and C respectively. This
+per-round generation model abstracts the continuous arrival processes of
+Section~\ref{sec:traffic_model} into a common discrete-time load: because
+exactly one packet is generated per node per round in every scenario, the
+total offered load is held constant by construction, and only the class
+composition varies. The single-class scenarios are the limiting cases in
+which the class tag is fixed to A, B, or C with probability one. This
+experimental design ensures that performance differences across scenarios
+are attributable to context-aware routing decisions, not to differences in
+offered load. Consequently, the five non-clustering baselines, whose
+delivery, energy, and lifetime are determined entirely by the shared
+per-link channel realisation, produce identical results across all four
+scenarios. The two clustering baselines (RLCR, FQ-UCR) likewise make no use
+of the packet's urgency class, but because their cluster-head selection is
+stochastic, their per-scenario means differ within seed-to-seed sampling
+variation rather than through any class-adaptive mechanism. CARL-WSN, by
+contrast, varies its routing systematically with class composition, as the
+RL agent selects different paradigms for different traffic mixes. These
+proportions reflect a realistic smart city IoT deployment in which emergency
+events are infrequent, periodic environmental monitoring dominates network
+traffic, and event-driven sensing forms an intermediate
 tier~\cite{el-fouly_environment-aware_2023,zohrabi2024}.
 
 \subsection{Simulation Parameters}
@@ -1722,8 +1740,6 @@ and network lifetime. Table~\ref{tab:defer_sweep} reports PDR and FND
 as $T_{\mathrm{defer}}$ and $\delta_{\max}$ are varied.
 Disabling deferral ($T_{\mathrm{defer}} = 0$) yields the highest PDR
 (95.1\%) at the lowest FND (381), while aggressive deferral
-($T_{\mathrm{defer}} = 0.20$, $\delta_{\max} = 10$) yields the highest PDR
-(95.1\%) at the lowest FND (381), while aggressive deferral
 ($T_{\mathrm{defer}} = 0.20$, $\delta_{\max} = 10$) yields the
 highest FND (635) at the lowest PDR (66.4\%). The relationship is
 monotonic: deferring more non-urgent traffic at near-depleted nodes
@@ -1793,7 +1809,7 @@ the deployment environment rather than of the protocol.
 \hline
 \textbf{Parameter (range)} & \textbf{PDR} & \textbf{FND} & \textbf{HND} & \textbf{LatA} & \textbf{OH} \\
 \hline
-$w_e/w_p$ (0.4/0.6--0.8/0.2) & 0.6 & 0.0 & 4.7 & 1.0 & 0.4 \\
+$w_e/w_p$ (0.4/0.6)          & 0.6 & 0.0 & 4.7 & 1.0 & 0.4 \\
 PRR $\beta$ (80--100)        & 10.1 & 64.8 & 28.5 & 16.2 & 2.7 \\
 PRR $\alpha$ (0.12--0.25)    & 0.2 & 15.2 & 6.5 & 6.9 & 4.3 \\
 $T_L$ (0.6--0.8)             & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
@@ -1805,7 +1821,7 @@ $T_L$ (0.6--0.8)             & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
 In summary, CARL-WSN's behaviour is robust to its tunable design
 choices: delivery is essentially unchanged across the relay weights, the
 link-stability threshold, and the channel sharpness; lifetime shows only mild
-sensitivity to the channel sharpness ($\le$15\% FND swing) and none to the
+sensitivity to the channel sharpness ($\sim$15\% FND swing) and none to the
 other two; and all metrics vary with the channel midpoint only as the
 underlying physics dictates, equally for all protocols. The deferral policy is
 the one parameter with a deliberate, well-characterised effect, and
@@ -1833,7 +1849,7 @@ two clustering protocols, and below MSLBA.
 \caption{CARL-WSN Standing on Principal Metrics --- Mixed Traffic}
 \label{tab:improvements}
 \centering
-\begin{tabular}{ll}
+\begin{tabular}{l p{7.5cm}}
 \hline
 \textbf{Metric} & \textbf{CARL-WSN result} \\
 \hline
@@ -1844,7 +1860,7 @@ Routing overhead       & Far below AODV/ZRP/DSDV; above clustering \\
 Packet delivery        & 90.2\% ($\approx$5 pts below baselines) \\
 Energy consumption & Statistically comparable to all baselines \\
 Energy balance (Gini) & No significant difference involving CARL-WSN \\
-Throughput & Comparable to classical and EH-Routing; below MSLBA \\
+Throughput & Comparable to classical and EH-Routing; above clustering; below MSLBA \\
 \hline
 \end{tabular}
 \end{table}
@@ -1904,7 +1920,14 @@ a well-known vulnerability of flat-routing protocols: nodes near the
 base station forward disproportionate traffic and deplete early. The
 classical flat protocols (AODV, DSDV, ZRP) share an identical FND of
 327 under mixed traffic, since they select next hops on geographic
-progress alone without regard to residual energy.
+progress alone without regard to residual energy. It is therefore the
+relay-selection and deferral mechanisms, rather than the choice of
+routing paradigm itself, that account for CARL-WSN's lifetime
+advantage; this is confirmed directly by Table~\ref{tab:defer_sweep},
+where disabling deferral lowers FND to 381 --- on par with EH-Routing
+(380) and below RLCR (390) --- so that the lead over the
+lifetime-oriented baselines is produced by the deferral policy that
+the urgency signal makes possible, not by paradigm switching.
 
 By weighting relay selection toward residual energy as well as
 progress, and by bounding deferral at near-depleted nodes, CARL-WSN
@@ -2088,7 +2111,11 @@ second-highest mean half-node-death round (HND\,=\,2198), behind only
 MSLBA. Tukey HSD analysis confirms these lifetime gains are statistically
 significant over the classical protocols and FQ-UCR (and, for HND, over
 RLCR), while CARL-WSN remains statistically comparable to the
-energy-oriented baselines EH-Routing and MSLBA.
+energy-oriented baselines EH-Routing and MSLBA. This lifetime advantage
+is produced by the energy-aware relay selection and bounded deferral
+that the per-packet urgency signal enables, rather than by paradigm
+switching itself: as Table~\ref{tab:defer_sweep} shows, disabling
+deferral returns FND to the level of the energy-oriented baselines.
 
 \item \textbf{Low emergency latency.} CARL-WSN delivers Class~A
 traffic in 24.2\,ms, a 25.6\% reduction versus AODV and among the
