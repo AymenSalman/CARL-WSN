@@ -1,5 +1,5 @@
 
-\documentclass[preprint,12pt,number]{elsarticle}
+\documentclass[12pt]{article}
 
 % ── Packages ──────────────────────────────────────────────────────────────
 \usepackage[T1]{fontenc}
@@ -15,91 +15,50 @@
 \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 \usepackage{lineno}
 \usepackage{microtype}
+\usepackage[margin=1in]{geometry}
 \emergencystretch=1em
 
 % ── Graphics path ─────────────────────────────────────────────────────────
 \graphicspath{{../figures/}}
 
-% ── Journal name ──────────────────────────────────────────────────────────
-\journal{Ad Hoc Networks}
-
 \begin{document}
-
-\begin{frontmatter}
 
 \title{CARL-WSN: Context-Aware Reinforcement Learning for Hybrid Routing in Heterogeneous IoT-Driven Wireless Sensor Networks}
 
-\author[nahrainCS]{Aymen Jaber Salman\corref{cor1}}
-\ead{aymen.j.salman@nahrainuniv.edu.iq}
+\author{
+Aymen Jaber Salman\thanks{Corresponding author. Email: aymen.j.salman@nahrainuniv.edu.iq} \and
+Atheel Nowfal Alkhayyat\thanks{Email: atheel.n.al-khayyat@nahrainuniv.edu.iq} \and
+Ruslan Saad Abdulrahman\thanks{Email: ruslan.s.al-nuaimi@nahrainuniv.edu.iq}
+}
+\date{Department of Computer Engineering, Al-Nahrain University, Baghdad, Iraq}
 
-\author[nahrainCS]{Atheel Nowfal Alkhayyat}
-\ead{atheel.n.al-khayyat@nahrainuniv.edu.iq}
-
-\author[nahrainCS]{Ruslan Saad Abdulrahman}
-\ead{ruslan.s.al-nuaimi@nahrainuniv.edu.iq}
-
-\cortext[cor1]{Corresponding author.}
-\address[nahrainCS]{Department of Computer Engineering, Al-Nahrain University, Baghdad, Iraq}
+\maketitle
 
 \begin{abstract}
-Wireless Sensor Networks (WSNs) deployed in IoT-driven smart city
-environments carry heterogeneous application traffic with
-fundamentally different quality-of-service requirements. Existing
-routing protocols --- including recent reinforcement learning (RL)
-based approaches --- optimise a single objective such as energy
-efficiency or network lifetime without adapting routing behaviour to
-the urgency class of individual packets. This paper proposes
-CARL-WSN, a Context-Aware Reinforcement Learning protocol that uses
-a tabular Q-Learning agent to dynamically select the routing
-paradigm --- proactive, reactive, or hybrid --- on a per-packet basis.
-The agent observes a three-dimensional context vector comprising
-application urgency class, normalised residual energy, and link
-stability score, and learns a class-dependent multi-objective reward
-function that weights latency, overhead, and energy preservation
-according to traffic priority. A safety constraint forces
-Class~A emergency packets onto proactive routing regardless of the
-agent's policy, guaranteeing sub-100\,ms delivery at all times.
-CARL-WSN further integrates energy-aware relay selection and bounded
-critical-node packet deferral to extend network lifetime. The
-compact Q-table (216\,bytes of RAM, stored in single precision)
-enables deployment on resource-constrained sensor hardware. CARL-WSN is evaluated in
-MATLAB against seven baseline protocols --- AODV, DSDV, ZRP, two
-domain-specific baselines (EH-Routing, MSLBA), and two recent
-RL-based approaches (RLCR and FQ-UCR) --- under four traffic
-scenarios across 20 independent seeds (640~runs), with all protocols
-re-implemented on a common distance-dependent lossy-channel model so
-that delivery, latency, and energy emerge from identical physical
-assumptions. Under mixed traffic, CARL-WSN extends network lifetime beyond the classical baselines (first node
-death at round 418, the highest of all protocols; half-node death at round
-2198, second only to MSLBA),
-delivers the lowest Class~A emergency latency among the
-reactive and learning-based protocols (24.2\,ms, a 25.6\% reduction
-versus AODV), and incurs routing overhead far below the
-flooding- and table-based protocols (0.53 control packets per data
-packet, versus 14.82 for AODV and 2.31 for DSDV). The lifetime gain stems from energy-aware relay selection
-and bounded critical-node deferral, which the per-packet urgency signal
-enables, while the learned paradigm switching contributes the
-context-adaptive overhead and the emergency-latency protection. These gains are
-obtained by trading a modest amount of packet delivery: CARL-WSN
-achieves 90.2\% PDR under its tuned deferral policy, within roughly
-five points of the baselines, with energy consumption statistically comparable across all protocols and
-throughput comparable to the classical and energy-harvesting baselines. The learned Q-table
-converges within approximately 1150 rounds, and the agent
-autonomously discovers context-dependent policies that adapt routing
-overhead to traffic-class composition --- a capability absent in all
-seven baselines. A sensitivity analysis confirms that CARL-WSN's
-performance is robust to its principal design parameters.
+Wireless Sensor Networks (WSNs) in IoT-driven smart cities carry heterogeneous
+traffic with conflicting quality-of-service demands, yet no existing routing
+protocol — including reinforcement learning (RL) approaches such as RLCR and
+FQ-UCR, which apply Q-Learning within a single fixed paradigm — learns to
+select between fundamentally different routing paradigms per packet, leaving
+that choice urgency-blind. This paper introduces CARL-WSN, a Context-Aware RL
+protocol that dynamically selects the routing paradigm — proactive, reactive,
+or hybrid — per packet via tabular Q-Learning over a context vector of
+urgency, residual energy, and link stability. A hard safety constraint forces
+emergency traffic onto proactive routing regardless of policy, guaranteeing
+sub-100~ms delivery. Evaluated in MATLAB against seven baselines over 640
+runs on a common lossy-channel model, CARL-WSN leads classical and clustering
+baselines in pre-failure lifetime, comparable to the strongest energy-oriented
+baselines; attains the lowest emergency latency among reactive and
+learning-based baselines (24.2~ms, 25.6\% below AODV); and incurs overhead far
+below flooding- and table-based protocols (0.53 vs.\ 14.82 for AODV), at a
+modest delivery cost (90.2\% PDR). These results show that learning which
+paradigm to use, not merely optimizing within one, is an effective operating
+point for heterogeneous, latency-critical IoT-WSN deployments.
 \end{abstract}
 
-\begin{keyword}
-Wireless sensor networks \sep Reinforcement learning \sep Q-Learning \sep
-Context-aware routing \sep Hybrid routing protocol \sep IoT \sep
-Smart city \sep Energy-aware relay selection \sep Heterogeneous traffic
-\end{keyword}
-
-\end{frontmatter}
-
-\linenumbers
+\vspace{0.5em}
+\noindent\textbf{Keywords:} Wireless sensor networks; Reinforcement learning; Q-Learning; Context-aware routing; Heterogeneous traffic; IoT; Energy-aware relay selection
+\vspace{1em}
 
 % ── SECTION I ─────────────────────────────────────────────────────────────────
 \section{Introduction}
@@ -113,10 +72,7 @@ quality-of-service (QoS) requirements~\cite{akyildiz2002,zohrabi2024}.
 A single WSN deployment may generate emergency alerts requiring
 sub-100\,ms delivery, periodic telemetry tolerating delays of tens
 of seconds, and event-driven uploads with best-effort requirements.
-This traffic heterogeneity demands routing protocols that adapt
-their behaviour to the urgency class of individual packets --- a
-capability absent from both classical and recent learning-based
-routing approaches.
+This traffic heterogeneity demands routing protocols that adapt their behaviour to the urgency class of individual packets — a capability absent from both classical and recent learning-based routing approaches. Even recent RL-based protocols such as RLCR~\cite{daanoune_intelligent_2026} and FQ-UCR~\cite{wang_fqucr_2025} apply Q-Learning only within a single fixed routing paradigm, leaving the choice between proactive, reactive, and hybrid routing itself unlearned and blind to packet urgency; this paper instead learns which paradigm to use, per packet, from a joint context of urgency, energy, and link stability.
 
 Routing protocols for WSNs fall into three paradigms, each with
 inherent trade-offs. Proactive protocols such as DSDV~\cite{perkins1994}
@@ -150,11 +106,7 @@ A 2025 comprehensive survey by Khedr et al.~\cite{roberts2025}
 explicitly identified dynamic application-context-based hybrid mode
 switching as an open research direction in IoT-driven WSNs, noting
 that reactive and hybrid context-aware approaches have received
-significantly less attention than proactive ones. No published
-protocol uses reinforcement learning to select between fundamentally
-different routing paradigms --- proactive, reactive, and hybrid ---
-on a per-packet basis according to application urgency. This paper
-addresses that gap directly.
+significantly less attention than proactive ones. No published protocol closes this gap. This paper does so directly.
 
 The main contributions of this paper are as follows:
 
@@ -189,13 +141,14 @@ classical protocols (AODV, DSDV, ZRP), two domain-specific baselines
 common distance-dependent lossy-channel model with per-hop
 acknowledgement and retransmission, so that packet delivery, latency,
 and energy consumption emerge from identical physical assumptions
-rather than from protocol-specific idealisations. Under this unified
-methodology, CARL-WSN extends network lifetime beyond all baselines
-(highest first-node-death round) and attains the lowest emergency-traffic
-latency among the reactive and learning-based protocols, while
-incurring routing overhead far below the flooding- and table-based
-protocols. These gains are obtained by trading a modest, quantified
-reduction in packet delivery, which we characterise explicitly.
+rather than from protocol-specific idealisations. Under this unified methodol-
+ogy, CARL-WSN leads the classical and clustering baselines in network
+lifetime (highest mean first-node-death round), performing comparably to
+the strongest energy-oriented baselines, and attains the lowest emergency-traffic
+latency among the reactive and learning-based protocols, while incurring rout-
+ing overhead far below the flooding- and table-based protocols. These
+gains are obtained by trading a modest, quantified reduction in packet
+delivery, which we characterise explicitly.
 \end{itemize}
 
 The remainder of this paper is organised as follows.
@@ -982,7 +935,7 @@ $s \gets \textsc{StateIndex}(U, E_r^i, L_s^i)$\;
   \tcp{Step 2: Safety constraint --- emergency traffic bypasses learning}
   $a \gets$ proactive\;
 }{
-  \tcc{Step 3: Bounded critical-node deferral}
+  \tcp{Step 3: Bounded critical-node deferral}
 \eIf{$E_r^i < T_{\text{defer}}$ \textbf{and} $U \in \{B, C\}$ \textbf{and} $c_{\text{def}}^i < \delta_{max}$}{
     $c_{\text{def}}^i \leftarrow c_{\text{def}}^i + 1$\;
     Defer packet (minimal listening energy cost)\;
@@ -1393,10 +1346,11 @@ CARL-WSN's FND is significantly higher than the classical protocols
 (AODV/DSDV/ZRP) and FQ-UCR, and its HND is significantly higher than the
 classical protocols, RLCR, and FQ-UCR. CARL-WSN attains the highest mean FND
 and the second-highest mean HND overall, but its lifetime advantage over
-EH-Routing, MSLBA, and RLCR is within seed-to-seed variation and is not
-statistically significant; on lifetime, CARL-WSN is therefore best described
-as leading the classical and clustering baselines while remaining comparable
-to the energy-oriented baselines (EH-Routing, MSLBA).
+EH-Routing, MSLBA, and RLCR falls within seed-to-seed variation, indicating
+statistically comparable performance rather than a distinguishable difference;
+on lifetime, CARL-WSN is therefore best described as leading the classical and
+clustering baselines while remaining statistically comparable to the
+energy-oriented baselines (EH-Routing, MSLBA).
 
 Fig.~\ref{fig:alive} shows the alive-nodes-over-time curves under
 mixed traffic for a representative seed. CARL-WSN sustains a high
@@ -1681,10 +1635,10 @@ protocol.
 On network lifetime, CARL-WSN leads on the means: its FND (418) exceeds
 RLCR's (390) and greatly exceeds FQ-UCR's (123), and its HND (2198) is far
 above both clustering protocols (RLCR 1305, FQ-UCR 1172), which degrade
-rapidly once cluster heads begin to fail. The HND gap over both clustering
-protocols is statistically significant, as is the FND gap over FQ-UCR; the
-FND difference from RLCR, however, is within seed variation and not
-significant. On Class~A latency, CARL-WSN (24.2\,ms) is significantly lower than both RLCR
+rapidly once cluster heads begin to fail. The HND gap over both
+clustering protocols is statistically significant, as is the FND gap over FQ-UCR;
+the FND difference from RLCR, however, falls within seed-to-seed variation,
+indicating statistically comparable performance on this metric. On Class~A latency, CARL-WSN (24.2\,ms) is significantly lower than both RLCR
 (34.0\,ms) and FQ-UCR (35.2\,ms), since neither clustering protocol
 prioritises emergency traffic. On routing overhead, the ordering
 reverses: the clustering protocols' amortised control traffic
@@ -1832,12 +1786,14 @@ Table~\ref{tab:defer_sweep}.
 
 Table~\ref{tab:improvements} summarises CARL-WSN's standing against
 the baseline group across the principal metrics under mixed traffic.
-The results support a focused set of claims. CARL-WSN delivers the
-\textbf{longest pre-failure lifetime} (highest FND, second-highest
-HND), the \textbf{lowest emergency latency among the reactive and
-learning-based protocols} (24.2\,ms, 25.6\% below AODV), and
-\textbf{routing overhead far below the flooding- and table-based
-protocols} (0.53 versus 2.31--14.82). These gains are obtained at a
+The results support a focused
+set of claims. CARL-WSN leads the classical and clustering baselines in
+pre-failure lifetime (highest mean FND, second-highest mean HND), with
+results statistically comparable to the strongest energy-oriented baselines;
+achieves the lowest emergency latency among the
+reactive and learning-based protocols (24.2 ms, 25.6% below AODV); and
+incurs routing overhead far below the flooding- and table-based protocols
+(0.53 versus 2.31–14.82). These gains are obtained at a
 modest, bounded cost in packet delivery (90.2\% PDR, $\approx$5
 points below the baselines), while energy consumption is statistically comparable to every baseline. Energy
 balance shows no significant difference involving CARL-WSN, and throughput is
@@ -1853,8 +1809,8 @@ two clustering protocols, and below MSLBA.
 \hline
 \textbf{Metric} & \textbf{CARL-WSN result} \\
 \hline
-Network lifetime (FND) & Highest of all eight protocols (418) \\
-Network lifetime (HND) & Second-highest (2198), behind MSLBA \\
+Network lifetime (FND) & Highest mean (418); significantly above classical baselines \& FQ-UCR; comparable to EH-Routing, MSLBA, RLCR \\
+Network lifetime (HND) & Second-highest mean (2198); significantly above classical baselines, RLCR, FQ-UCR \\
 Class~A latency        & 25.6\% below AODV; among the lowest overall \\
 Routing overhead       & Far below AODV/ZRP/DSDV; above clustering \\
 Packet delivery        & 90.2\% ($\approx$5 pts below baselines) \\
@@ -1925,23 +1881,22 @@ relay-selection and deferral mechanisms, rather than the choice of
 routing paradigm itself, that account for CARL-WSN's lifetime
 advantage; this is confirmed directly by Table~\ref{tab:defer_sweep},
 where disabling deferral lowers FND to 381 --- on par with EH-Routing
-(380) and below RLCR (390) --- so that the lead over the
-lifetime-oriented baselines is produced by the deferral policy that
-the urgency signal makes possible, not by paradigm switching.
+(380) and below RLCR (390) --- so that CARL-WSN's numerical edge over the lifetime-oriented baselines is
+produced by the deferral policy that the urgency signal makes possible, not
+by paradigm switching.
 
-By weighting relay selection toward residual energy as well as
-progress, and by bounding deferral at near-depleted nodes, CARL-WSN
-raises FND to 418 --- the highest of all eight protocols, ahead of
-the energy-harvesting (EH-Routing, 380) and clustering (RLCR, 390)
-baselines, and 28\% above the classical flat protocols. On
-half-node-death, CARL-WSN reaches HND\,=\,2198, second only to
-MSLBA (2340) and well above the classical protocols (1877) and both
-clustering protocols (1305 and 1172). The combination of
-energy-aware relaying and bounded deferral thus delays both the
-onset and the progression of network failure, giving a flat-routing
-protocol a lifetime profile competitive with, and on FND exceeding,
-the dedicated lifetime-oriented baselines --- while retaining the
-low control overhead characteristic of flat routing relative to
+By weighting relay selection toward residual energy as well as progress,
+and by bounding deferral at near-depleted nodes, CARL-WSN raises FND
+to 418 — the highest mean of all eight protocols, numerically ahead of the
+energy-harvesting (EH-Routing, 380) and clustering (RLCR, 390) baselines, and
+significantly above the classical flat protocols by 28\%. On half-node-death,
+CARL-WSN reaches HND = 2198, second only to MSLBA (2340) and significantly
+above the classical protocols (1877) and both clustering protocols (1305 and
+1172). The combination of energy-aware relaying and bounded deferral thus
+delays both the onset and the progression of network failure, giving a
+flat-routing protocol a lifetime profile statistically comparable to, and on
+FND numerically exceeding, the dedicated lifetime-oriented baselines — while
+retaining the low control overhead characteristic of flat routing relative to
 flooding and table maintenance.
 
 It is important to state the cost of this lifetime gain plainly. The
@@ -2179,8 +2134,14 @@ question. Fourth, investigating adaptive reward-weight tuning that
 adjusts the class-dependent weight vectors based on real-time network
 congestion and remaining energy budget.
 
+\section*{Conflict of Interest Statement}
+The authors declare that they have no conflict of interest.
+
+\section*{Funding Statement}
+This research received no specific grant from any funding agency in the
+public, commercial, or not-for-profit sectors.
 % ── References ────────────────────────────────────────────────────────────────
-\bibliographystyle{elsarticle-num}
+\bibliographystyle{unsrt}
 \bibliography{references}
 
 \end{document}
