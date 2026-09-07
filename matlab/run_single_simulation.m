@@ -33,24 +33,70 @@ for r = 1:R
 
    alive_idx = find(net.alive);
 
-   % ── Per-round routing overhead + route-cache aging ──
+       % ── Per-round routing overhead + route-cache aging ──
     net.route_age = max(net.route_age - 1, 0);
     n_alive = sum(net.alive);
     switch protocol_name
-        case 'DSDV'
-            % Full-dump: each node broadcasts its entire table (n_alive
-            % entries), fragmented across packets.
-            frags = ceil(n_alive * params.dsdv_entry_bits / params.L);
-            ctrl_pkts = ctrl_pkts + n_alive * frags / params.T_update;
+                case 'DSDV'
+            if mod(r, params.T_full_dump) == 0
+                % Full dump: entire table (n_alive entries), fragmented
+                % across full-size data packets. Sent every T_full_dump
+                % rounds — infrequent, matching real DSDV's periodic
+                % full-table broadcast (ns-3 reference model).
+                frags = ceil(n_alive * params.dsdv_entry_bits / params.L);
+                [e_tx, e_rx] = energy_model(params, params.L, params.comm_range);
+                for ii = alive_idx(:)'
+                    nb = find_neighbours(ii, net, params.comm_range);
+                    ctrl_pkts = ctrl_pkts + frags;
+                    net.energy(ii) = max(net.energy(ii) - frags*e_tx, 0);
+                    net.energy(nb) = max(net.energy(nb) - frags*e_rx, 0);
+                    net = check_node_death(net, ii, params);
+                    for jj = nb, net = check_node_death(net, jj, params); end
+                end
+            else
+                % Incremental (triggered) update: one small single-entry
+                % packet broadcast every other round — matching real
+                % DSDV's frequent small triggered updates between full
+                % dumps (ns-3 reference model).
+                [e_tx, e_rx] = energy_model(params, params.dsdv_entry_bits, params.comm_range);
+                for ii = alive_idx(:)'
+                    nb = find_neighbours(ii, net, params.comm_range);
+                    ctrl_pkts = ctrl_pkts + 1;
+                    net.energy(ii) = max(net.energy(ii) - e_tx, 0);
+                    net.energy(nb) = max(net.energy(nb) - e_rx, 0);
+                    net = check_node_death(net, ii, params);
+                    for jj = nb, net = check_node_death(net, jj, params); end
+                end
+            end
+
         case {'EH_Routing','MSLBA'}
-            % Single small state value (energy / nearest-sink id): one packet.
-            ctrl_pkts = ctrl_pkts + n_alive / params.T_update;
+            % Single small state value (energy / nearest-sink id), one
+            % beacon-sized packet, broadcast once every T_update rounds.
+            if mod(r, params.T_update) == 0
+                [e_tx, e_rx] = energy_model(params, params.L_ctrl, params.comm_range);
+                for ii = alive_idx(:)'
+                    nb = find_neighbours(ii, net, params.comm_range);
+                    ctrl_pkts = ctrl_pkts + 1;
+                    net.energy(ii) = max(net.energy(ii) - e_tx, 0);
+                    net.energy(nb) = max(net.energy(nb) - e_rx, 0);
+                    net = check_node_death(net, ii, params);
+                    for jj = nb, net = check_node_death(net, jj, params); end
+                end
+            end
         case 'ZRP'
-            for ii = alive_idx(:)'
-                E_r = net.energy(ii)/net.E0(ii);
-                if E_r>=0.7, zr=120; elseif E_r>=0.3, zr=80; else, zr=40; end
-                if hypot(net.x(ii)-net.BS(1),net.y(ii)-net.BS(2)) <= zr
-                    ctrl_pkts = ctrl_pkts + 1/params.T_update;
+            if mod(r, params.T_update) == 0
+                [e_tx, e_rx] = energy_model(params, params.L_ctrl, params.comm_range);
+                for ii = alive_idx(:)'
+                    E_r = net.energy(ii)/net.E0(ii);
+                    if E_r>=0.7, zr=120; elseif E_r>=0.3, zr=80; else, zr=40; end
+                    if hypot(net.x(ii)-net.BS(1),net.y(ii)-net.BS(2)) <= zr
+                        nb = find_neighbours(ii, net, params.comm_range);
+                        ctrl_pkts = ctrl_pkts + 1;
+                        net.energy(ii) = max(net.energy(ii) - e_tx, 0);
+                        net.energy(nb) = max(net.energy(nb) - e_rx, 0);
+                        net = check_node_death(net, ii, params);
+                        for jj = nb, net = check_node_death(net, jj, params); end
+                    end
                 end
             end
     end
@@ -75,8 +121,10 @@ for r = 1:R
                     context_classifier_rl(node_id, pkt_class, net, params, Q, epsilon);
 
                 % --- critical-node deferral: counts as generated, not delivered ---
-                if strcmp(mode_selected, 'defer')
-                    net.defer_count(node_id) = net.defer_count(node_id) + 1;
+                                if strcmp(mode_selected, 'defer')
+                    % Packet's TTL is guaranteed to expire before this node
+                    % could recover (see context_classifier_rl.m) — counted
+                    % as expired, not an unexplained instant drop.
                     net.energy(node_id) = max(net.energy(node_id) ...
                         - params.L*params.E_elec*0.1, 0);     % listening cost only
                     net = check_node_death(net, node_id, params);
@@ -89,19 +137,32 @@ for r = 1:R
                 [net, delivered, lat_data, n_hops, ~, e_used] = ...
                     forward_to_dest(node_id, net, params, net.BS, 'carl');
 
-                % --- paradigm-dependent latency + Option-C overhead ---
+                                % --- paradigm-dependent latency + Option-C overhead ---
                 lat = lat_data; ctrl = 0;
                 switch mode_selected
                     case 'proactive'                           % maintained table, no discovery
                         ctrl = 1;
-                    case 'reactive'                            % on-demand discovery (energy piggybacked), cached
+                        [e_tx, e_rx] = energy_model(params, params.L_ctrl, params.comm_range);
+                        nb = find_neighbours(node_id, net, params.comm_range);
+                        net.energy(node_id) = max(net.energy(node_id) - e_tx, 0);
+                        net.energy(nb) = max(net.energy(nb) - e_rx, 0);
+                        net = check_node_death(net, node_id, params);
+                        for jj = nb, net = check_node_death(net, jj, params); end
+                    case {'reactive','hybrid'}                 % on-demand / zone-scoped discovery, cached
                         if net.route_age(node_id) <= 0
                             ctrl = 1; net.route_age(node_id) = params.T_route;
-                            lat = lat + n_hops*(params.L/params.datarate*1000);
-                        end
-                    case 'hybrid'                              % zone-scoped discovery, cached
-                        if net.route_age(node_id) <= 0
-                            ctrl = 1; net.route_age(node_id) = params.T_route;
+                            if strcmp(mode_selected,'reactive')
+                                lat = lat + n_hops*(params.L/params.datarate*1000);
+                            end
+                            % RREQ-analog broadcast + RREP-analog unicast (matches route_baseline.m)
+                            [e_tx_req, e_rx_req] = energy_model(params, params.L_RREQ, params.comm_range);
+                            net.energy(node_id) = max(net.energy(node_id) - e_tx_req, 0);
+                            other_alive = find(net.alive); other_alive(other_alive==node_id) = [];
+                            net.energy(other_alive) = max(net.energy(other_alive) - e_rx_req, 0);
+                            [e_tx_rep, e_rx_rep] = energy_model(params, params.L_RREP, params.comm_range);
+                            net.energy(node_id) = max(net.energy(node_id) - n_hops*(e_tx_rep+e_rx_rep), 0);
+                            net = check_node_death(net, node_id, params);
+                            for jj = other_alive, net = check_node_death(net, jj, params); end
                         end
                 end
                 ctrl_pkts = ctrl_pkts + ctrl;

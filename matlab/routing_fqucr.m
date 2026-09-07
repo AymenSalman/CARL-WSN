@@ -175,8 +175,31 @@ if net.round - net.fqucr_last_cluster_round >= cluster_interval
         end
     end
     
-    n_ch = length(net.fqucr_ch_list);
+       n_ch = length(net.fqucr_ch_list);
     net.cluster_ctrl = net.cluster_ctrl + n_alive + (n_alive - n_ch);
+
+    % ── Control-packet energy: CH advertisement (broadcast) + join (unicast) ──
+    [e_tx_adv, e_rx_adv] = energy_model(params, params.L_ctrl, params.comm_range);
+    for idx = 1:n_alive
+        nid = alive_nodes(idx);
+        nb  = find_neighbours(nid, net, params.comm_range);
+        net.energy(nid) = max(net.energy(nid) - e_tx_adv, 0);
+        net.energy(nb)  = max(net.energy(nb)  - e_rx_adv, 0);
+    end
+    for idx = 1:n_alive
+        nid = alive_nodes(idx);
+        if ~ismember(nid, final_chs)
+            my_ch = net.fqucr_membership(nid);
+            d_join = sqrt((net.x(nid)-net.x(my_ch))^2 + (net.y(nid)-net.y(my_ch))^2);
+            [e_tx_j, e_rx_j] = energy_model(params, params.L_ctrl, d_join);
+            net.energy(nid)   = max(net.energy(nid)   - e_tx_j, 0);
+            net.energy(my_ch) = max(net.energy(my_ch) - e_rx_j, 0);
+        end
+    end
+    for idx = 1:n_alive
+        net = check_node_death(net, alive_nodes(idx), params);
+    end
+
     net.fqucr_last_cluster_round = net.round;
 end
 

@@ -29,7 +29,11 @@ params.w_e = 0.6;   % relay energy weight   (GEAR-style; swept)
 %% ── Overhead / discovery ────────────────────────────────────────────────
 params.T_update = 1;     % proactive table-broadcast interval (rounds)
 params.T_route  = 5;     % AODV route-cache lifetime (rounds); grounded in AODV RFC, swept
-
+params.T_full_dump = params.T_route;  % DSDV full-dump interval tied to the same
+                                        % staleness-tolerance timescale as AODV/CARL-WSN's
+                                        % route-cache lifetime (T_route), for internal
+                                        % consistency across protocols rather than an
+                                        % independently chosen constant
 %% ── Traffic classes ───────────────────────────────────────────────────────
 % Class A: emergency — low latency critical
 % Class B: periodic telemetry — energy efficient
@@ -70,8 +74,17 @@ params.eps_fs = params.epsilon_fs;   % alias for baseline compatibility
 params.eps_mp = params.epsilon_mp;   % alias for baseline compatibility
 
 params.T_defer = 0.05;   % critical-node deferral threshold (swept)
-params.max_defer = 3;   % max consecutive deferrals before forced transmit (swept)
+% params.max_defer retired: deferral below T_defer is now unconditional and
+% permanent for the remainder of the node's life, since energy is strictly
+% non-increasing (Eq. 3, no harvesting) — a forced-retransmit escape valve
+% cannot restore a node above T_defer once crossed, so it served no
+% physically meaningful purpose. See context_classifier_rl.m.
 params.cluster_overhead_mode = 'tdma';   % 'recluster' or 'tdma' (clustering overhead model)
+
+%% ── Control-packet sizes (RFC 3561 / RFC 6550 verified) ────────────────────
+params.L_RREQ = 24*8;    % RREQ size, bits (RFC 3561 Section 5.1: 24 bytes)
+params.L_RREP = 20*8;    % RREP size, bits (RFC 3561 Section 5.2: 20 bytes)
+params.L_ctrl = 20*8;    % Generic beacon/control packet, bits (RFC 3561 Section 6.9 Hello-message convention)
 
 %% ── Simulation ────────────────────────────────────────────────────────────
 params.rounds     = 2000;   % total simulation rounds

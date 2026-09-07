@@ -35,11 +35,15 @@ if strcmp(U, 'A')
 end
 
 %% ── Step 3b: Critical energy deferral for non-urgent traffic ──────────
-% When node is nearly dead (E_r < 0.15), defer Class B/C packets
-% This is a context-aware energy preservation mechanism that only
-% CARL-WSN can perform because it differentiates traffic classes
-if E_r < params.T_defer && (strcmp(U, 'B') || strcmp(U, 'C')) ...
-        && net.defer_count(node_id) < params.max_defer
+% Once a node's energy drops below T_defer, it can never recover above it
+% (no energy harvesting in this model — energy is strictly non-increasing,
+% Eq. 3). Therefore any deferred Class B/C packet's usefulness window
+% (TTL, matching its class's own latency tolerance from Sec. 3.2) is
+% mathematically guaranteed to elapse before the node could ever resume
+% normal transmission. Deferral below T_defer is therefore unconditional
+% and permanent for the remainder of the node's lifetime — there is no
+% forced-retransmit escape valve.
+if E_r < params.T_defer && (strcmp(U, 'B') || strcmp(U, 'C'))
     mode = 'defer';
     action_idx = 0;
     return;
