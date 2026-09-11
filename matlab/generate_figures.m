@@ -58,6 +58,8 @@ OH(strcmp(protocols,'RLCR'))   = results_mean(find(strcmp(protocols,'RLCR')),sMi
 OH(strcmp(protocols,'FQ_UCR')) = results_mean(find(strcmp(protocols,'FQ_UCR')),sMix,1,M.OHt);
 b=bar(OH,'FaceColor','flat'); for i=1:np, b.CData(i,:)=cols(i,:); end
 set(gca,'YScale','log'); ylabel('Control Packets per Data Packet (log)');
+ylim([min(OH)*0.5, max(OH)*3]);   % extra headroom so the tallest bar's
+                                    % label clears the title above it
 for i=1:np, text(i,OH(i)*1.15,sprintf('%.2f',OH(i)),'HorizontalAlignment','center','FontSize',9); end
 title('Routing Overhead (clustering under TDMA accounting)'); stylex();
 exportgraphics(gcf,[figdir 'fig5_routing_overhead.pdf'],'ContentType','vector');

@@ -28,12 +28,23 @@ params.w_e = 0.6;   % relay energy weight   (GEAR-style; swept)
 
 %% ── Overhead / discovery ────────────────────────────────────────────────
 params.T_update = 1;     % proactive table-broadcast interval (rounds)
-params.T_route  = 5;     % AODV route-cache lifetime (rounds); grounded in AODV RFC, swept
+params.T_route  = 5;     % AODV route-cache lifetime (rounds); RFC 3561 defines this parameter type (ACTIVE_ROUTE_TIMEOUT), value chosen for internal consistency (see T_full_dump, rpl_I_min)
 params.T_full_dump = params.T_route;  % DSDV full-dump interval tied to the same
                                         % staleness-tolerance timescale as AODV/CARL-WSN's
                                         % route-cache lifetime (T_route), for internal
                                         % consistency across protocols rather than an
                                         % independently chosen constant
+
+%% ── RPL (RFC 6550/6719/6206-grounded Trickle + MRHOF baseline) ──────────
+params.rpl_I_min     = params.T_route;         % Trickle Imin (rounds); same internal
+                                                 % consistency anchor as T_full_dump
+params.rpl_doublings = 8;                       % Contiki-NG default [Oikonomou et al.,
+                                                 % SoftwareX 2022]; RFC 6550's own
+                                                 % suggested 20 is impractical at this
+                                                 % I_min scale (see methodology notes)
+params.rpl_I_max     = params.rpl_I_min * 2^params.rpl_doublings;  % = 1280 rounds
+params.rpl_k         = 10;                      % RFC 6550's own official DIORedundancyConstant
+params.rpl_hysteresis = 1.5;                    % RFC 6719 PARENT_SWITCH_THRESHOLD, in ETX units
 %% ── Traffic classes ───────────────────────────────────────────────────────
 % Class A: emergency — low latency critical
 % Class B: periodic telemetry — energy efficient
@@ -64,7 +75,10 @@ params.dsdv_entry_bits = 96;   % bits per DSDV routing-table entry
                                % Grounded in Perkins & Bhagwat full-dump structure; swept.
 
 %% ── Routing ───────────────────────────────────────────────────────────────
-params.zone_radius = 2;   % ZRP zone radius (hops) — base value for hybrid mode
+% params.zone_radius = 2;   % LEGACY/UNUSED — ZRP's actual zone logic is
+                              % hardcoded (energy-scaled 40/80/120m) directly
+                              % in route_baseline.m; this parameter has no
+                              % effect on any result in this study
 
 %% ── Base station position ─────────────────────────────────────────────────
 params.BS_x = 100;    % BS x-coordinate (centre of area)
@@ -94,6 +108,13 @@ params.seed       = 42;     % random seed for reproducibility
 %% ── Output ────────────────────────────────────────────────────────────────
 params.save_results = true;
 params.results_dir  = '..\results\';   % relative path to results folder
+
+%% ── Q-Learning hyperparameters (swept for grid search) ──────────────────
+params.alpha_lr      = 0.1;     % learning rate
+params.gamma_df       = 0.9;    % discount factor
+params.epsilon0       = 0.1;    % initial exploration rate
+params.epsilon_decay  = 0.998;  % decay per round
+params.epsilon_min    = 0.01;   % minimum exploration
 
 fprintf('Parameters loaded: N=%d, area=%dx%d m, rounds=%d\n', ...
         params.N, params.area, params.area, params.rounds);

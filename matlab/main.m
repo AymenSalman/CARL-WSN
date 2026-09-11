@@ -2,7 +2,7 @@
 %  8 protocols x 4 scenarios x 20 seeds = 640 runs, serial, run-to-death.
 clc; clear; close all;
 params = get_params();
-protocols = {'CARHy_RL','AODV','DSDV','ZRP','EH_Routing','MSLBA','RLCR','FQ_UCR'};
+protocols = {'CARHy_RL','AODV','DSDV','ZRP','EH_Routing','MSLBA','RLCR','FQ_UCR','RPL','CARHy_Rule'};
 scenarios = {'ClassA','ClassB','ClassC','Mixed'};
 seeds     = 42:61;            % 20 seeds
 params.rounds = 8000;         % SAFETY CAP; runs stop earlier at <10% alive

@@ -38,6 +38,14 @@ net.L_s         = ones(1, N);        % link stability = 1.0 (perfect) at start
 net.ack_history = ones(params.W, N);   % was ones(10,N) — now W=30
 net.LND         = 0;                   % last node death (run-to-death horizon)
 net.cluster_ctrl = 0;   % accumulated clustering control packets (RLCR/FQ-UCR)
+% RPL state (Row 3 baseline)
+net.rpl_rank        = inf(1, params.N);   % undefined until DODAG reaches this node
+net.rpl_parent      = -1 * ones(1, params.N); % -1 = unassigned; 0 = BS directly; >0 = real node id
+net.rpl_I           = params.rpl_I_min * ones(1, params.N);
+net.rpl_interval_start = zeros(1, params.N);
+net.rpl_listen_t    = zeros(1, params.N);
+net.rpl_c           = zeros(1, params.N);
+net.rpl_heard       = zeros(1, params.N);  % consistent DIOs heard this interval
 net.cluster_ctrl_tdma = 0;
 net.route_age   = zeros(1, N);         % AODV/ZRP route cache age
 
