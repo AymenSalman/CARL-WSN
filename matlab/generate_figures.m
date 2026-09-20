@@ -2,20 +2,23 @@
 clc; clear; close all;
 load('..\results\campaign_results.mat');   % must run from the matlab\ folder
 
-disp_names = {'CARL-WSN','AODV','DSDV','ZRP','EH-Routing','MSLBA','RLCR','FQ-UCR'};
-np = numel(protocols);
+disp_names = {'CARL-WSN','AODV','DSDV','ZRP','EH-Routing','MSLBA','RLCR','FQ-UCR','RPL'};
+np = 9;   % explicitly excludes CARHy_Rule (index 10), which is the
+          % rule-based ablation, reported separately in Table 6 --
+          % it is not one of the nine main comparison protocols
 sMix = find(strcmp(scenarios,'Mixed'));
 cols = [0.20 0.45 0.80; 0.30 0.69 0.29; 0.84 0.19 0.15; 1.00 0.60 0.00; ...
-        0.49 0.18 0.56; 0.55 0.34 0.29; 0.30 0.75 0.75; 0.90 0.42 0.65];
+        0.49 0.18 0.56; 0.55 0.34 0.29; 0.30 0.75 0.75; 0.90 0.42 0.65; ...
+        0.93 0.69 0.13];
 figdir = '..\figures\';
-mu  = @(s,met) squeeze(results_mean(:,s,1,met));
-sd  = @(s,met) squeeze(results_std (:,s,1,met));
+mu  = @(s,met) squeeze(results_mean(1:9,s,1,met));
+sd  = @(s,met) squeeze(results_std (1:9,s,1,met));
 setfig = @() set(gcf,'Color','w','Position',[100 100 760 480]);
 stylex = @() set(gca,'XTick',1:np,'XTickLabel',disp_names,'XTickLabelRotation',35,...
                  'FontSize',12,'FontWeight','bold','Box','off');
 
 % Fig 1: lifetime FND + HND
-figure; setfig();
+figure; setfig(); set(gca,'Toolbar',[]);
 F=mu(sMix,M.FND); H=mu(sMix,M.HND); Fe=sd(sMix,M.FND); He=sd(sMix,M.HND);
 b=bar([F H],'grouped'); b(1).FaceColor=[0.20 0.45 0.80]; b(2).FaceColor=[0.84 0.19 0.15];
 hold on; errorbar(b(1).XEndPoints,F,Fe,'k','linestyle','none','LineWidth',1);
@@ -36,7 +39,7 @@ exportgraphics(gcf,[figdir 'fig2_latency_classA.pdf'],'ContentType','vector');
 
 % Fig 3: PDR across scenarios
 figure; setfig();
-PDR=squeeze(results_mean(:,:,1,M.PDR))*100;
+PDR=squeeze(results_mean(1:9,:,1,M.PDR))*100;
 bar(PDR,'grouped'); ylabel('Packet Delivery Ratio (%)'); ylim([0 110]);
 legend(scenarios,'Location','southoutside','Orientation','horizontal');
 title('PDR across Traffic Scenarios'); stylex();
@@ -44,6 +47,7 @@ exportgraphics(gcf,[figdir 'fig3_PDR_scenarios.pdf'],'ContentType','vector');
 
 % Fig 4: Gini
 figure; setfig();
+set(gca,'Toolbar',[]);
 G=mu(sMix,M.Gini); Ge=sd(sMix,M.Gini);
 b=bar(G,'FaceColor','flat'); for i=1:np, b.CData(i,:)=cols(i,:); end
 hold on; errorbar(1:np,G,Ge,'k','linestyle','none','LineWidth',1);
@@ -53,9 +57,10 @@ exportgraphics(gcf,[figdir 'fig4_energy_gini.pdf'],'ContentType','vector');
 
 % Fig 5: overhead, log scale, clustering at TDMA
 figure; setfig();
+set(gca,'Toolbar',[]);
 OH=mu(sMix,M.OH);
-OH(strcmp(protocols,'RLCR'))   = results_mean(find(strcmp(protocols,'RLCR')),sMix,1,M.OHt);
-OH(strcmp(protocols,'FQ_UCR')) = results_mean(find(strcmp(protocols,'FQ_UCR')),sMix,1,M.OHt);
+OH(strcmp(protocols(1:9),'RLCR'))   = results_mean(find(strcmp(protocols,'RLCR')),sMix,1,M.OHt);
+OH(strcmp(protocols(1:9),'FQ_UCR')) = results_mean(find(strcmp(protocols,'FQ_UCR')),sMix,1,M.OHt);
 b=bar(OH,'FaceColor','flat'); for i=1:np, b.CData(i,:)=cols(i,:); end
 set(gca,'YScale','log'); ylabel('Control Packets per Data Packet (log)');
 ylim([min(OH)*0.5, max(OH)*3]);   % extra headroom so the tallest bar's
@@ -83,7 +88,7 @@ end
 xlabel('Round'); ylabel('Alive Nodes'); xlim([0 1500]); ylim([0 100]);
 legend(disp_names,'Location','northeastoutside');
 title('Network Decay — Mixed Traffic (seed 42)');
-set(gca,'FontSize',12,'FontWeight','bold','Box','off');
+set(gca,'FontSize',12,'FontWeight','bold','Box','off'); set(gca,'Toolbar',[]);
 exportgraphics(gcf,[figdir 'fig7_alive_curve.pdf'],'ContentType','vector');
 
 fprintf('All 7 figures written to %s\n', figdir);
