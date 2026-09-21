@@ -1963,6 +1963,39 @@ the one parameter with a deliberate, well-characterised effect, and
 the chosen operating point is justified by the frontier in
 Table~\ref{tab:defer_sweep}.
 
+\subsubsection{Hyperparameter Grid Search}
+
+To confirm that CARL-WSN's reported results are not artifacts of
+cherry-picked Q-learning hyperparameters, we conducted a full
+factorial grid search over the learning rate ($\alpha$), discount
+factor ($\gamma$), and exploration decay ($\delta$), testing three
+values of each parameter (27 combinations total) across all 20
+seeds under mixed traffic (540 runs). Table~\ref{tab:hyperparam}
+reports the resulting swing in each headline metric across all 27
+combinations.
+
+\begin{table}[!t]
+\renewcommand{\arraystretch}{1.2}
+\caption{Hyperparameter Grid Search --- Metric Swing (\%) Across 27 Combinations}
+\label{tab:hyperparam}
+\centering
+\begin{tabular}{lc}
+\hline
+\textbf{Metric} & \textbf{Swing (\%)} \\
+\hline
+PDR  & 0.34 \\
+FND  & 2.01 \\
+HND  & 3.10 \\
+\hline
+\multicolumn{2}{l}{\footnotesize Swing = $100 \times (\max - \min)/\mathrm{mean}$ across all 27 combinations.} \\
+\end{tabular}
+\end{table}
+
+All three metrics vary by under 3.5\% across the full grid,
+indicating that CARL-WSN's performance is robust to these
+hyperparameter choices and that the results reported throughout
+this study are not sensitive to the specific values selected.
+
 \subsection{Summary of Findings}
 
 Table~\ref{tab:improvements} summarises CARL-WSN's standing against
