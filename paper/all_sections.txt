@@ -1,0 +1,66 @@
+80:\section{Introduction}
+182:\section{Related Work}
+185:\subsection{Proactive and Reactive Routing Protocols}
+214:\subsection{Hybrid Routing Protocols}
+244:\subsection{Context-Aware Routing in IoT-WSNs}
+297:\subsection{Reinforcement Learning for WSN Routing}
+383:\subsection{Research Gaps}
+411:\section{System Model}
+414:\subsection{Network Topology}
+434:\subsection{Traffic Model}\label{sec:traffic_model}
+462:\subsection{Channel and Energy Model}
+504:\subsection{Link Reliability and Retransmission Model}
+544:\subsection{Link Stability Model}
+566:\subsection{Energy-Aware Relay Selection Model}
+596:\subsection{Critical-Node Packet Deferral}
+628:\subsection{Performance Metrics}
+668:\section{CARL-WSN Protocol Design}
+671:\subsection{Design Motivation}
+690:\subsection{The Context Vector}
+707:\subsection{MDP Formulation}
+713:\subsubsection{State Space}\label{sec:state_space}
+764:\subsubsection{Action Space}
+778:\subsubsection{Reward Function}
+833:\subsubsection{Q-Learning Update Rule}\label{sec:qupdate}
+871:\subsection{Safety Constraint}
+899:\subsection{Routing Modes}
+903:\subsubsection{Proactive Mode}\label{sec:proactive}
+915:\subsubsection{Reactive Mode}\label{sec:reactive}
+932:\subsubsection{Hybrid Mode}\label{sec:hybrid}
+965:\subsection{Complete Per-Packet Routing Procedure}
+1018:\subsection{Overhead Analysis}
+1038:\subsection{Computational Complexity}
+1070:\subsection{Rule-Based Ablation: Isolating the Value of Learning}
+1106:\section{Simulation Setup}
+1109:\subsection{Network Model}
+1137:\subsection{Energy Model}
+1144:\subsection{Traffic Scenarios}
+1186:\subsection{Simulation Parameters}
+1230:\subsection{Experimental Protocol}
+1253:\subsection{Baseline Protocols}
+1345:\subsection{Performance Metrics}
+1355:\section{Results and Analysis}
+1380:\subsection{Class~A Emergency Packet Latency}
+1416:\subsection{Routing Overhead}
+1479:\subsection{Network Lifetime}
+1567:\subsection{Energy Efficiency and Balance}
+1601:\subsection{Throughput}
+1637:\subsection{Packet Delivery Ratio}
+1677:\subsection{Context-Awareness Validation}
+1722:\subsection{Q-Learning Convergence and Learned Policy}
+1825:\subsection{CARL-WSN vs RL Baselines}
+1890:\subsection{Sensitivity Analysis}
+1902:\subsubsection{Deferral Policy: the Lifetime--Delivery Frontier}
+1946:\subsubsection{Robustness to Model Parameters}
+1999:\subsubsection{Hyperparameter Grid Search}
+2032:\subsection{Summary of Findings}
+2156:\section{Discussion}
+2159:\subsection{Lifetime Extension Without Clustering}
+2198:\subsection{Energy-Aware Relay Selection and Network Lifetime}
+2251:\subsection{Safety Constraints in RL-Based Routing}
+2276:\subsection{Q-Learning Convergence Behaviour}
+2309:\subsection{Is Learning Necessary? Results of the Rule-Based Ablation}
+2366:\subsection{Context-Awareness as a Unique Capability}
+2386:\subsection{Practical Deployment Considerations}
+2441:\subsection{Limitations}
+2484:\section{Conclusion}

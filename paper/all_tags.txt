@@ -1,0 +1,75 @@
+72:IoT-WSN deployments.}\rtag{R1-3/R2-A/R3-4 + R2-D}
+138:never updated by the learning process.}\rtag{R3-3}
+167:quantified reduction in packet delivery, which we characterise explicitly.}\rtag{R2-D}
+357:considered here.}\rtag{R3-1}
+502:costs accumulated over round $t$, not a single packet.}\rtag{R1-3/R2-A/R3-4}
+621:modest delivery cost.}\rtag{R1-1} Class~A emergency packets are never deferred
+963:packets to use different modes concurrently without inconsistency.}\rtag{R2-C}
+989:  \tcp{Step 3: Unconditional critical-node deferral}\rtag{R1-1}
+1055:evaluate in this study.}\rtag{R2-H} The memory footprint comprises the Q-table
+1068:and Arduino-class devices without modification.}\rtag{R3-5}
+1079:three-branch rule:}\rtag{R2-E}
+1103:seeds.}\rtag{R2-E}
+1168:composition varies.}\rtag{R2-B} The single-class scenarios are the limiting cases in
+1273:broadcast.}\rtag{R1-3/R2-A/R3-4}
+1321:itself was reproduced.}\rtag{R3-2}
+1335:WSN-specific RPL adaptation.}\rtag{R2-D}
+1343:comparable under the same WSN simulation framework.}\rtag{R2-D}
+1403:none of the lower-latency baselines possess.}\rtag{R2-D}
+1445:discovery, avoiding network-wide floods entirely.}\rtag{R1-3/R2-A/R3-4}
+1465:suppression.}\rtag{R1-3/R2-A/R3-4 + R2-D}
+1496:together delay the first energy depletion in the network.}\rtag{R1-3/R2-A/R3-4 + R2-D}
+1516:overall standing as a consistently strong, top-tier performer on both.}\rtag{R1-3/R2-A/R3-4 + R2-D}
+1523:curve, consistent with its collapsed FND of 59.}\rtag{R1-3/R2-A/R3-4 + R2-D}
+1627:with EH-Routing and RLCR.}\rtag{R1-3/R2-A/R3-4 + R2-D}
+1635:network lifetime.}\rtag{R1-3/R2-A/R3-4 + R2-D}
+1645:that collapses its lifetime (Section~}\ref{sec:discussion}\hlx{).}\rtag{R1-3/R2-A/R3-4} CARL-WSN
+1665:the safety guarantee is unaffected.}\rtag{R1-1} \hlx{Decomposed by traffic class, this
+1670:node's residual energy crosses the threshold.}\rtag{R2-G} \hlx{The overall 87.3\%
+1675:extension of network lifetime.}\rtag{R1-1}
+1713:noise.}\rtag{R1-3/R2-A/R3-4} The baselines, by contrast, generate identical overhead
+1735:margin.}\rtag{R1-1} After convergence, the agent exploits its learned policy with only
+1790:traffic.}\rtag{R1-3/R2-A/R3-4}
+1802:states (Class~B/C).}\rtag{R3-3}}
+1833:protocol.}\rtag{R1-3/R2-A/R3-4}
+1854:unconditional deferral (Section~}\ref{sec:model}\hlx{).}\rtag{R1-3/R2-A/R3-4}
+1867:overhead-constrained, delivery-sensitive homogeneous monitoring.}\rtag{R1-3/R2-A/R3-4}
+1897:($T_{\mathrm{defer}}$), which governs the lifetime--delivery trade,}\rtag{R1-1}
+1914:proportional cost in delivery.}\rtag{R1-1}
+1944:this single parameter.}\rtag{R1-1}
+2008:combinations.}\rtag{R3-6}
+2030:this study are not sensitive to the specific values selected.}\rtag{R3-6}
+2059:RLCR.}\rtag{R1-3/R2-D}
+2091:its overall quartile averaged across all six.}\rtag{Authors' New Addition}
+2127:mean rank (4.17 of 9) below RPL's, MSLBA's, and ZRP's.}\rtag{Authors' New Addition}
+2138:trade space rather than one dominating the rest.}\rtag{Authors' New Addition}}
+2153:emergency responsiveness outweigh best-effort delivery volume.}\rtag{Authors' New Addition}
+2170:metrics; each makes a coherent trade.}\rtag{R1-3/R2-A/R3-4}
+2187:lifetime profile clustering does not match.}\rtag{R1-3/R2-A/R3-4}
+2202:base station forward disproportionate traffic and deplete early.}\rtag{R1-3/R2-A/R3-4}
+2222:of the relay-selection contribution.}\rtag{R1-3/R2-A/R3-4}
+2238:and table-based classical protocols.}\rtag{R1-3/R2-A/R3-4}
+2249:honestly-quantified delivery cost.}\rtag{R1-1}
+2269:urgency-agnostic.}\rtag{R2-D} In a deployment where both emergency and routine
+2288:events that previously exercised the agent in that regime.}\rtag{R1-1}
+2324:comparison would provide.}\rtag{R2-E}
+2334:performs statistically indistinguishably from the learned policy.}\rtag{R2-E}
+2344:than omit or obscure it.}\rtag{R2-E}
+2364:or policy unpredictability is undesirable.}\rtag{R2-E}
+2400:would be the more appropriate choice.}\rtag{Authors' New Addition}
+2403:the standard routing table)}\rtag{R3-5} \hlx{and per-packet computation time (under
+2407:the full breakdown is given in Section~}\ref{sec:complexity}\hlx{.}\rtag{R2-H}
+2439:as future work.}\rtag{R2-F}
+2480:learning.}\rtag{R2-E}
+2500:critical-node packet deferral}\rtag{R1-1} \hlx{extends network lifetime to a level
+2501:statistically among the strongest of all evaluated baselines.}\rtag{R1-3/R2-A/R3-4}
+2524:deferral lowers FND to 316, on par with EH-Routing (312).}\rtag{R1-3/R2-A/R3-4}
+2528:second-lowest of all nine protocols behind only MSLBA}\rtag{R2-D}, with the
+2537:does not replicate;}\rtag{R2-D} this is an inherent benefit CARL-WSN trades for
+2546:same adaptation despite using no learned policy.}\rtag{R2-E}
+2559:comparable to EH-Routing and RLCR.}\rtag{R1-1}
+2567:simultaneously (Table~}\ref{tab:quartile_all}\hlx{).}\rtag{R1-3/R2-D} \hlx{This is the concise
+2573:lifetime and latency gains.}\rtag{Authors' New Addition}
+2582:proactive routing for emergency traffic.}\rtag{R1-1}
+2592:at the cost of a real, quantified reduction in best-effort delivery.}\rtag{R1-3/R2-A/R3-4}
+2604:comparison against clustering protocols \hlx{and RPL in particular}\rtag{R2-D}

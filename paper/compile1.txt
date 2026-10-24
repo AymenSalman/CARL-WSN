@@ -1,0 +1,950 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./main.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-def/pdftex.def)))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/float/float.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/tools/array.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/url/url.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/booktabs/booktabs.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/xcolor/xcolor.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/local/texlive/2026/texmf-dist/tex/generic/soul/soul.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/soul/soul-ori.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/generic/infwarerr/infwarerr.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/generic/etexcmds/etexcmds.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/iftex/iftex.sty)))
+(/usr/local/texlive/2026/texmf-dist/tex/generic/soul/soulutf8.sty
+
+Package soulutf8 Warning: This package is obsolete,
+(soulutf8)                use the soul package directly. 
+(soulutf8)                 on input line 29.
+
+) (/usr/local/texlive/2026/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/generic/gettitlestring/gettitlestring.s
+ty (/usr/local/texlive/2026/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/generic/stringenc/stringenc.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/local/texlive/2026/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/local/texlive/2026/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty)))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/local/texlive/2026/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+
+(/usr/local/texlive/2026/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+))) (/usr/local/texlive/2026/texmf-dist/tex/latex/algorithm2e/algorithm2e.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/ifoddpage/ifoddpage.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/tools/xspace.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/relsize/relsize.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/lineno/lineno.sty)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/microtype.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/microtype-pdftex.def)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/microtype.cfg))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/geometry/geometry.sty
+(/usr/local/texlive/2026/texmf-dist/tex/generic/iftex/ifvtex.sty))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+No file main.aux.
+(/usr/local/texlive/2026/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/local/texlive/2026/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(/usr/local/texlive/2026/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+(/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/mt-cmr.cfg)
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/mt-msa.cfg)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/local/texlive/2026/texmf-dist/tex/latex/microtype/mt-msb.cfg)
+
+LaTeX Warning: Citation `akyildiz2002' on page 1 undefined on input line 87.
+
+
+LaTeX Warning: Citation `zohrabi2024' on page 1 undefined on input line 87.
+
+
+LaTeX Warning: Citation `daanoune_intelligent_2026' on page 1 undefined on inpu
+t line 91.
+
+
+LaTeX Warning: Citation `wang_fqucr_2025' on page 1 undefined on input line 91.
+
+
+[1{/usr/local/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/l
+ocal/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}{/usr/loc
+al/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
+
+LaTeX Warning: Citation `perkins1994' on page 2 undefined on input line 94.
+
+
+LaTeX Warning: Citation `perkins1999' on page 2 undefined on input line 96.
+
+
+LaTeX Warning: Citation `johnson1996' on page 2 undefined on input line 96.
+
+
+LaTeX Warning: Citation `selim_manet_2025' on page 2 undefined on input line 10
+0.
+
+
+LaTeX Warning: Citation `haas2001' on page 2 undefined on input line 101.
+
+
+LaTeX Warning: Citation `daanoune_intelligent_2026' on page 2 undefined on inpu
+t line 106.
+
+
+LaTeX Warning: Citation `wang_fqucr_2025' on page 2 undefined on input line 109
+.
+
+
+LaTeX Warning: Citation `roberts2025' on page 2 undefined on input line 121.
+
+[2]
+
+LaTeX Warning: Reference `sec:related' on page 3 undefined on input line 171.
+
+
+LaTeX Warning: Reference `sec:model' on page 3 undefined on input line 172.
+
+
+LaTeX Warning: Reference `sec:protocol' on page 3 undefined on input line 173.
+
+
+LaTeX Warning: Reference `sec:simulation' on page 3 undefined on input line 175
+.
+
+
+LaTeX Warning: Reference `sec:results' on page 3 undefined on input line 176.
+
+
+LaTeX Warning: Reference `sec:discussion' on page 3 undefined on input line 177
+.
+
+
+LaTeX Warning: Reference `sec:conclusion' on page 3 undefined on input line 178
+.
+
+
+LaTeX Warning: Citation `akkaya2005' on page 3 undefined on input line 188.
+
+
+LaTeX Warning: Citation `perkins1994' on page 3 undefined on input line 189.
+
+
+LaTeX Warning: Citation `clausen2003' on page 3 undefined on input line 192.
+
+
+LaTeX Warning: Citation `akkaya2005' on page 3 undefined on input line 197.
+
+[3]
+
+LaTeX Warning: Citation `perkins1999' on page 4 undefined on input line 200.
+
+
+LaTeX Warning: Citation `selim_manet_2025' on page 4 undefined on input line 20
+4.
+
+
+LaTeX Warning: Citation `nurul_hidayah_ahmad_zukri_comparative_2025' on page 4 
+undefined on input line 205.
+
+
+LaTeX Warning: Citation `karthikeyan_optimizing_2025' on page 4 undefined on in
+put line 208.
+
+
+LaTeX Warning: Citation `haas2001' on page 4 undefined on input line 218.
+
+
+LaTeX Warning: Citation `chaurasiya_energy-efficient_2023' on page 4 undefined 
+on input line 226.
+
+
+LaTeX Warning: Citation `lei_energy-aware_2024' on page 4 undefined on input li
+ne 229.
+
+
+LaTeX Warning: Citation `nadanam_innovative_2026' on page 4 undefined on input 
+line 234.
+
+
+Overfull \hbox (4.86644pt too wide) in paragraph at lines 225--238
+[]\T1/cmr/m/n/12 (-20) Subsequent hy-brid ap-proaches in-cor-po-rated ad-di-tio
+nal op-ti-mi-sa-tion di-men-sions. Chaurasiya
+
+LaTeX Warning: Citation `perera_context_2014' on page 4 undefined on input line
+ 247.
+
+
+LaTeX Warning: Citation `monteiro_context-aware_2019' on page 4 undefined on in
+put line 255.
+
+
+LaTeX Warning: Citation `sithik_intelligent_2022' on page 4 undefined on input 
+line 260.
+
+
+LaTeX Warning: Citation `karagiannis_context-aware_2023' on page 4 undefined on
+ input line 266.
+
+
+LaTeX Warning: Citation `hasan_context-aware_2025' on page 4 undefined on input
+ line 271.
+
+
+LaTeX Warning: Citation `akpakwu_cacc_2020' on page 4 undefined on input line 2
+75.
+
+[4]
+
+LaTeX Warning: Citation `karunkuzhali_oqr-sc_2022' on page 5 undefined on input
+ line 280.
+
+
+LaTeX Warning: Citation `karunkuzhali_qos-aware_2024' on page 5 undefined on in
+put line 280.
+
+
+LaTeX Warning: Citation `el-fouly_environment-aware_2023' on page 5 undefined o
+n input line 285.
+
+
+LaTeX Warning: Citation `salman2023' on page 5 undefined on input line 289.
+
+
+LaTeX Warning: Citation `hanif_opportunistically_2018' on page 5 undefined on i
+nput line 290.
+
+
+LaTeX Warning: Citation `inga_novel_2021' on page 5 undefined on input line 291
+.
+
+
+LaTeX Warning: Citation `ekler_energy_2022' on page 5 undefined on input line 2
+93.
+
+
+LaTeX Warning: Citation `priyadarshi_energy-efficient_2024' on page 5 undefined
+ on input line 301.
+
+
+LaTeX Warning: Citation `priyadarshi_ai-based_2025' on page 5 undefined on inpu
+t line 301.
+
+
+LaTeX Warning: Citation `yilmaz_sustainable_2025' on page 5 undefined on input 
+line 301.
+
+
+LaTeX Warning: Citation `daanoune_intelligent_2026' on page 5 undefined on inpu
+t line 307.
+
+
+LaTeX Warning: Citation `wang_fqucr_2025' on page 5 undefined on input line 321
+.
+
+[5]
+
+LaTeX Warning: Citation `sudha_intelligent_2025' on page 6 undefined on input l
+ine 333.
+
+
+LaTeX Warning: Citation `saadallah_comprehensive_2024' on page 6 undefined on i
+nput line 337.
+
+
+LaTeX Warning: Citation `kumar_exploring_2025' on page 6 undefined on input lin
+e 340.
+
+
+LaTeX Warning: Reference `tab:comparison' on page 6 undefined on input line 344
+.
+
+
+LaTeX Warning: Citation `daanoune_intelligent_2026' on page 6 undefined on inpu
+t line 380.
+
+
+LaTeX Warning: Citation `wang_fqucr_2025' on page 6 undefined on input line 380
+.
+
+
+LaTeX Warning: Citation `sithik_intelligent_2022' on page 6 undefined on input 
+line 380.
+
+
+LaTeX Warning: Citation `karagiannis_context-aware_2023' on page 6 undefined on
+ input line 380.
+
+
+LaTeX Warning: Citation `hasan_context-aware_2025' on page 6 undefined on input
+ line 380.
+
+
+LaTeX Warning: Citation `haas2001' on page 6 undefined on input line 380.
+
+
+LaTeX Warning: Citation `roberts2025' on page 6 undefined on input line 386.
+
+
+LaTeX Warning: Citation `daanoune_intelligent_2026' on page 6 undefined on inpu
+t line 392.
+
+
+LaTeX Warning: Citation `wang_fqucr_2025' on page 6 undefined on input line 393
+.
+
+
+LaTeX Warning: Citation `chu_leach_2026' on page 6 undefined on input line 396.
+
+
+
+LaTeX Warning: Citation `khanna_energy-efficient_2021' on page 6 undefined on i
+nput line 397.
+
+
+LaTeX Warning: Citation `prashanth2023' on page 6 undefined on input line 398.
+
+[6]
+
+LaTeX Warning: Citation `salman2023' on page 7 undefined on input line 422.
+
+
+LaTeX Warning: Citation `salman2021' on page 7 undefined on input line 427.
+
+
+LaTeX Warning: Citation `heinzelman2000' on page 7 undefined on input line 465.
+
+
+[7]
+
+LaTeX Warning: Reference `eq:etx' on page 8 undefined on input line 499.
+
+
+LaTeX Warning: Reference `eq:erx' on page 8 undefined on input line 499.
+
+
+LaTeX Warning: Reference `eq:eresidual' on page 8 undefined on input line 501.
+
+
+LaTeX Warning: Citation `zuniga2004' on page 8 undefined on input line 512.
+
+
+LaTeX Warning: Citation `ieee802154' on page 8 undefined on input line 526.
+
+
+LaTeX Warning: Reference `eq:etx' on page 8 undefined on input line 532.
+
+
+LaTeX Warning: Reference `eq:erx' on page 8 undefined on input line 532.
+
+[8]
+
+LaTeX Warning: Citation `woo2003' on page 9 undefined on input line 562.
+
+
+LaTeX Warning: Reference `sec:model' on page 9 undefined on input line 564.
+
+
+LaTeX Warning: Reference `eq:prr' on page 9 undefined on input line 590.
+
+
+LaTeX Warning: Reference `eq:eresidual' on page 9 undefined on input line 602.
+
+
+LaTeX Warning: Reference `sec:sensitivity' on page 9 undefined on input line 62
+0.
+
+[9]
+
+LaTeX Warning: Citation `daanoune_intelligent_2026' on page 10 undefined on inp
+ut line 674.
+
+
+LaTeX Warning: Citation `wang_fqucr_2025' on page 10 undefined on input line 67
+7.
+
+[10]
+
+LaTeX Warning: Reference `eq:ls' on page 11 undefined on input line 704.
+
+
+LaTeX Warning: Reference `tab:states' on page 11 undefined on input line 738.
+
+[11] [12]
+
+LaTeX Warning: Reference `eq:egreedy' on page 13 undefined on input line 885.
+
+
+LaTeX Warning: Citation `daanoune_intelligent_2026' on page 13 undefined on inp
+ut line 894.
+
+
+LaTeX Warning: Citation `wang_fqucr_2025' on page 13 undefined on input line 89
+5.
+
+[13]
+
+LaTeX Warning: Citation `perkins1994' on page 14 undefined on input line 904.
+
+
+LaTeX Warning: Reference `eq:relay' on page 14 undefined on input line 907.
+
+
+LaTeX Warning: Citation `perkins1999' on page 14 undefined on input line 916.
+
+
+LaTeX Warning: Citation `haas2001' on page 14 undefined on input line 933.
+
+
+LaTeX Warning: Reference `sec:state_space' on page 14 undefined on input line 9
+52.
+
+[14]
+
+LaTeX Warning: Reference `eq:relay' on page 15 undefined on input line 961.
+
+
+LaTeX Warning: Reference `alg:carlwsn' on page 15 undefined on input line 967.
+
+
+LaTeX Warning: Reference `eq:qupdate' on page 15 undefined on input line 1045.
+
+
+LaTeX Warning: Reference `eq:relay' on page 15 undefined on input line 1058.
+
+[15]
+
+LaTeX Warning: Reference `sec:qupdate' on page 16 undefined on input line 1078.
+
+
+[16]
+
+LaTeX Warning: Reference `sec:proactive' on page 17 undefined on input line 109
+0.
+
+
+LaTeX Warning: Reference `sec:hybrid' on page 17 undefined on input line 1090.
+
+
+LaTeX Warning: Reference `sec:proactive' on page 17 undefined on input line 109
+2.
+
+
+LaTeX Warning: Reference `sec:hybrid' on page 17 undefined on input line 1094.
+
+
+LaTeX Warning: Reference `sec:reactive' on page 17 undefined on input line 1096
+.
+
+
+LaTeX Warning: Reference `fig:policy' on page 17 undefined on input line 1097.
+
+
+LaTeX Warning: Reference `fig:qvalues' on page 17 undefined on input line 1097.
+
+
+
+LaTeX Warning: Reference `tab:states' on page 17 undefined on input line 1100.
+
+
+LaTeX Warning: Reference `fig:topology' on page 17 undefined on input line 1116
+.
+
+
+LaTeX Warning: Citation `salman2023' on page 17 undefined on input line 1118.
+
+
+LaTeX Warning: Citation `priyadarshi_ai-based_2025' on page 17 undefined on inp
+ut line 1123.
+
+
+LaTeX Warning: Citation `daanoune_intelligent_2026' on page 17 undefined on inp
+ut line 1123.
+
+
+LaTeX Warning: Citation `lbeer2025' on page 17 undefined on input line 1123.
+
+
+LaTeX Warning: Citation `heinzelman2000' on page 17 undefined on input line 113
+9.
+
+
+LaTeX Warning: Reference `eq:etx' on page 17 undefined on input line 1140.
+
+
+LaTeX Warning: Reference `eq:erx' on page 17 undefined on input line 1140.
+
+
+LaTeX Warning: Reference `sec:model' on page 17 undefined on input line 1141.
+
+
+LaTeX Warning: Reference `tab:params' on page 17 undefined on input line 1142.
+
+[17]
+
+LaTeX Warning: Reference `sec:traffic_model' on page 18 undefined on input line
+ 1165.
+
+
+LaTeX Warning: Citation `el-fouly_environment-aware_2023' on page 18 undefined 
+on input line 1184.
+
+
+LaTeX Warning: Citation `zohrabi2024' on page 18 undefined on input line 1184.
+
+[18 <../figures/Fig1_NetworkTopology.pdf>]
+
+LaTeX Warning: Reference `tab:params' on page 19 undefined on input line 1188.
+
+
+LaTeX Warning: Reference `sec:model' on page 19 undefined on input line 1237.
+
+
+LaTeX Warning: Reference `tab:params' on page 19 undefined on input line 1246.
+
+
+LaTeX Warning: Citation `perkins1999' on page 19 undefined on input line 1259.
+
+
+LaTeX Warning: Citation `perkins1994' on page 19 undefined on input line 1260.
+
+
+LaTeX Warning: Citation `haas2001' on page 19 undefined on input line 1261.
+
+
+LaTeX Warning: Reference `sec:simulation' on page 19 undefined on input line 12
+65.
+
+
+LaTeX Warning: Reference `sec:model' on page 19 undefined on input line 1269.
+
+
+LaTeX Warning: Reference `sec:results' on page 19 undefined on input line 1272.
+
+
+[19]
+
+LaTeX Warning: Citation `salman2021' on page 20 undefined on input line 1276.
+
+
+LaTeX Warning: Citation `salman2023' on page 20 undefined on input line 1279.
+
+
+LaTeX Warning: Citation `daanoune_intelligent_2026' on page 20 undefined on inp
+ut line 1283.
+
+
+LaTeX Warning: Citation `wang_fqucr_2025' on page 20 undefined on input line 12
+86.
+
+
+LaTeX Warning: Citation `wang_fqucr_2025' on page 20 undefined on input line 13
+00.
+
+
+LaTeX Warning: Citation `heinzelman2000' on page 20 undefined on input line 130
+6.
+
+
+LaTeX Warning: Reference `sec:model' on page 20 undefined on input line 1313.
+
+[20]
+
+LaTeX Warning: Citation `winter2012' on page 21 undefined on input line 1324.
+
+
+LaTeX Warning: Citation `gnawali2012' on page 21 undefined on input line 1326.
+
+
+LaTeX Warning: Citation `levis2011' on page 21 undefined on input line 1327.
+
+
+LaTeX Warning: Citation `oikonomou2022' on page 21 undefined on input line 1329
+.
+
+
+LaTeX Warning: Reference `tab:comparison' on page 21 undefined on input line 13
+40.
+
+
+LaTeX Warning: Reference `sec:simulation' on page 21 undefined on input line 13
+59.
+
+[21]
+
+LaTeX Warning: Reference `fig:latency' on page 22 undefined on input line 1382.
+
+
+
+LaTeX Warning: Reference `sec:results' on page 22 undefined on input line 1402.
+
+
+
+LaTeX Warning: Reference `tab:context' on page 22 undefined on input line 1402.
+
+
+
+LaTeX Warning: Reference `fig:overhead' on page 22 undefined on input line 1419
+.
+
+
+LaTeX Warning: Reference `sec:model' on page 22 undefined on input line 1432.
+
+
+LaTeX Warning: Reference `sec:discussion' on page 22 undefined on input line 14
+43.
+
+[22]
+
+LaTeX Warning: Reference `sec:results' on page 23 undefined on input line 1462.
+
+
+[23 <../figures/Fig2_ClassA_Latency.pdf>]
+
+LaTeX Warning: Reference `tab:results' on page 24 undefined on input line 1482.
+
+
+
+LaTeX Warning: Reference `sec:model' on page 24 undefined on input line 1488.
+
+
+LaTeX Warning: Reference `sec:discussion' on page 24 undefined on input line 14
+93.
+
+
+LaTeX Warning: Reference `eq:relay' on page 24 undefined on input line 1494.
+
+
+LaTeX Warning: Reference `sec:model' on page 24 undefined on input line 1495.
+
+[24 <../figures/Fig3_RoutingOverhead.pdf>]
+
+LaTeX Warning: Reference `fig:alive' on page 25 undefined on input line 1518.
+
+
+LaTeX Warning: Reference `fig:overhead' on page 25 undefined on input line 1564
+.
+
+
+LaTeX Warning: Reference `fig:gini' on page 25 undefined on input line 1579.
+
+[25] [26 <../figures/Fig4_AliveNodesOverTime.pdf>] [27 <../figures/Fig5_EnergyB
+alance_Gini.pdf>]
+
+LaTeX Warning: Reference `fig:throughput' on page 28 undefined on input line 16
+14.
+
+
+LaTeX Warning: Reference `sec:model' on page 28 undefined on input line 1619.
+
+[28 <../figures/Fig6_Throughput.pdf>]
+
+LaTeX Warning: Reference `sec:discussion' on page 29 undefined on input line 16
+45.
+
+
+LaTeX Warning: Reference `sec:model' on page 29 undefined on input line 1656.
+
+
+LaTeX Warning: Reference `sec:sensitivity' on page 29 undefined on input line 1
+663.
+
+
+LaTeX Warning: Reference `tab:context' on page 29 undefined on input line 1681.
+
+
+
+LaTeX Warning: Reference `eq:reward' on page 29 undefined on input line 1719.
+
+[29]
+
+LaTeX Warning: Reference `fig:convergence' on page 30 undefined on input line 1
+724.
+
+
+LaTeX Warning: Reference `sec:model' on page 30 undefined on input line 1732.
+
+
+LaTeX Warning: Reference `fig:policy' on page 30 undefined on input line 1747.
+
+
+LaTeX Warning: Reference `fig:qvalues' on page 30 undefined on input line 1757.
+
+
+[30]
+
+LaTeX Warning: Reference `fig:qvalues' on page 31 undefined on input line 1782.
+
+
+
+LaTeX Warning: Reference `fig:qvalues' on page 31 undefined on input line 1806.
+
+
+[31 <../figures/Fig7_QTableConvergence.pdf>]
+
+LaTeX Warning: Reference `sec:model' on page 32 undefined on input line 1854.
+
+[32 <../figures/Fig8_LearnedPolicy.pdf>]
+
+LaTeX Warning: Reference `tab:rl_compare' on page 33 undefined on input line 18
+56.
+
+[33 <../figures/Fig9_LearnedQValues.pdf>]
+
+LaTeX Warning: Reference `sec:protocol' on page 34 undefined on input line 1904
+.
+
+
+LaTeX Warning: Reference `tab:defer_sweep' on page 34 undefined on input line 1
+907.
+
+
+LaTeX Warning: Reference `sec:results' on page 34 undefined on input line 1938.
+
+
+[34]
+
+LaTeX Warning: Reference `tab:model_sweep' on page 35 undefined on input line 1
+948.
+
+
+LaTeX Warning: Reference `tab:defer_sweep' on page 35 undefined on input line 1
+997.
+
+
+LaTeX Warning: Reference `tab:hyperparam' on page 35 undefined on input line 20
+06.
+
+[35]
+
+LaTeX Warning: Reference `tab:improvements' on page 36 undefined on input line 
+2034.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2082--2082
+[]|\T1/cmr/m/n/12 (+20) 0.52; far be-low
+
+Underfull \hbox (badness 10000) in paragraph at lines 2082--2082
+\T1/cmr/m/n/12 (+20) AODV/ZRP/DSDV/EH-
+
+Underfull \hbox (badness 6141) in paragraph at lines 2082--2082
+[]|\T1/cmr/m/n/12 (+20) Above DSDV, FQ-UCR; be-low
+
+LaTeX Warning: Reference `tab:improvements' on page 36 undefined on input line 
+2087.
+
+
+LaTeX Warning: Reference `tab:quartile_all' on page 36 undefined on input line 
+2088.
+
+
+LaTeX Warning: Reference `tab:improvements' on page 36 undefined on input line 
+2115.
+
+
+LaTeX Warning: Reference `tab:quartile_all' on page 36 undefined on input line 
+2118.
+
+
+LaTeX Warning: Reference `fig:quartile_heatmap' on page 36 undefined on input l
+ine 2119.
+
+
+LaTeX Warning: Reference `tab:quartile_all' on page 36 undefined on input line 
+2138.
+
+
+LaTeX Warning: Reference `tab:quartile_all' on page 36 undefined on input line 
+2138.
+
+[36] [37]
+
+LaTeX Warning: Reference `sec:discussion' on page 38 undefined on input line 21
+79.
+
+
+LaTeX Warning: Reference `eq:relay' on page 38 undefined on input line 2200.
+
+[38]
+
+LaTeX Warning: Reference `sec:model' on page 39 undefined on input line 2205.
+
+
+LaTeX Warning: Reference `tab:defer_sweep' on page 39 undefined on input line 2
+217.
+
+[39 <../figures/Fig10_QuartileHeatmap.pdf>]
+
+LaTeX Warning: Reference `sec:sensitivity' on page 40 undefined on input line 2
+247.
+
+
+LaTeX Warning: Reference `eq:safety' on page 40 undefined on input line 2257.
+
+
+LaTeX Warning: Citation `daanoune_intelligent_2026' on page 40 undefined on inp
+ut line 2264.
+
+
+LaTeX Warning: Citation `wang_fqucr_2025' on page 40 undefined on input line 22
+65.
+
+
+LaTeX Warning: Citation `winter2012' on page 40 undefined on input line 2267.
+
+
+LaTeX Warning: Reference `fig:convergence' on page 40 undefined on input line 2
+278.
+
+[40]
+
+LaTeX Warning: Reference `fig:policy' on page 41 undefined on input line 2298.
+
+
+LaTeX Warning: Reference `sec:results' on page 41 undefined on input line 2303.
+
+
+
+LaTeX Warning: Reference `sec:rule_ablation' on page 41 undefined on input line
+ 2312.
+
+
+LaTeX Warning: Citation `henderson2018' on page 41 undefined on input line 2340
+.
+
+
+LaTeX Warning: Citation `bairaktaris2025' on page 41 undefined on input line 23
+43.
+
+
+LaTeX Warning: Reference `sec:discussion' on page 41 undefined on input line 23
+52.
+
+[41]
+
+LaTeX Warning: Reference `tab:context' on page 42 undefined on input line 2368.
+
+
+
+LaTeX Warning: Reference `sec:rule_ablation_results' on page 42 undefined on in
+put line 2381.
+
+
+LaTeX Warning: Reference `tab:improvements' on page 42 undefined on input line 
+2388.
+
+
+LaTeX Warning: Reference `sec:results' on page 42 undefined on input line 2399.
+
+
+
+LaTeX Warning: Reference `tab:quartile_all' on page 42 undefined on input line 
+2399.
+
+
+LaTeX Warning: Reference `sec:complexity' on page 42 undefined on input line 24
+07.
+
+
+LaTeX Warning: Reference `tab:params' on page 42 undefined on input line 2416.
+
+
+LaTeX Warning: Reference `sec:protocol' on page 42 undefined on input line 2419
+.
+
+[42]
+
+LaTeX Warning: Reference `sec:rule_ablation_results' on page 43 undefined on in
+put line 2460.
+
+[43] [44]
+
+LaTeX Warning: Reference `tab:improvements' on page 45 undefined on input line 
+2565.
+
+
+LaTeX Warning: Reference `tab:quartile_all' on page 45 undefined on input line 
+2567.
+
+[45]
+No file main.bbl.
+[46] (./main.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `main.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)</usr/local/texlive/2026/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2026/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2026/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2026/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2026/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2026/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2026/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2026/texmf-dist/f
+onts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2026/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2026/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2026/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2026/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/pub
+lic/cm-super/sfbi1200.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/publi
+c/cm-super/sfbx0800.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/
+cm-super/sfbx1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm
+-super/sfbx1095.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-s
+uper/sfbx1200.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-sup
+er/sfbx1440.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super
+/sfbx1728.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/s
+fcc1200.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfr
+m0700.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfrm0
+800.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfrm100
+0.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfrm1095.
+pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pf
+b></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfrm1440.pfb>
+</usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfrm2074.pfb></
+usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfti0800.pfb></us
+r/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfti1200.pfb></usr/
+local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sftt1200.pfb>
+Output written on main.pdf (46 pages, 1510828 bytes).
+Transcript written on main.log.
